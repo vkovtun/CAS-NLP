@@ -18,8 +18,8 @@
 .env.test.local
 .env.production.local
 
-/.idea
-/venv
+.idea
+venv
 models
 
 npm-debug.log*
