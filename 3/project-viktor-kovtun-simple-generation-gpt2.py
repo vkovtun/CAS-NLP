@@ -1,6 +1,10 @@
 from transformers import AutoModelForCausalLM, GPT2TokenizerFast, LogitsProcessor, LogitsProcessorList
 from tokenizers import Tokenizer, models, pre_tokenizers, decoders
 import torch
+import torch.nn.functional as F
+from transformers import AdamW, get_linear_schedule_with_warmup
+from torch.utils.data import DataLoader, Dataset
+from datasets import load_dataset
 
 pre_primer = ["a", "and", "away", "big", "blue", "can", "come", "down", "find", "for", "funny", "go", "help", "here", "I", "in", "is", "it", "jump", "little", "look", "make", "me", "my", "not", "one", "play", "red", "run", "said", "see", "the", "three", "to", "two", "up", "we", "where", "yellow", "you"]
 primer = ["all", "am", "are", "at", "ate", "be", "black", "brown", "but", "came", "did", "do", "eat", "four", "get", "good", "have", "he", "into", "like", "must", "new", "no", "now", "on", "our", "out", "please", "pretty", "ran", "ride", "saw", "say", "she", "so", "soon", "that", "there", "they", "this", "too", "under", "want", "was", "well", "went", "what", "white", "who", "will", "with", "yes"]
@@ -47,7 +51,49 @@ input_ids = word_tokenizer.encode(prompt).ids
 
 # Load a word-level compatible model
 # model = AutoModelForCausalLM.from_pretrained("leroyrr/roberta-ulmfit", is_decoder=True)
-model = AutoModelForCausalLM.from_pretrained("leroyrr/bert-base-head")
+model = AutoModelForCausalLM.from_pretrained("leroyrr/bert-base-head", is_decoder=True)
+# model = AutoModelForCausalLM.from_pretrained("vocab-transformers/distilbert-word2vec_256k-MLM_best")
+# model = AutoModelForCausalLM.from_pretrained("openai-community/gpt2")
+
+# Define the optimizer
+optimizer = AdamW(model.parameters(), lr=5e-5)
+
+dataset = load_dataset("rahular/simple-wikipedia")
+split_dataset = dataset['train'].train_test_split(test_size=0.2)
+train_dataset = split_dataset['train']
+test_dataset = split_dataset['test']
+
+train_dataloader = DataLoader(train_dataset, batch_size=2, shuffle=True)
+
+# Custom loss function to add a penalty for out-of-vocabulary tokens
+def custom_loss_function(logits, labels, vocab_token_ids, penalty_weight=5.0):
+    # Apply penalty for out-of-vocabulary tokens
+    vocab_mask = torch.full(logits.shape, -float('inf'), dtype=logits.dtype, device=logits.device)
+    vocab_mask[..., list(vocab_token_ids)] = 0.0  # No penalty for in-vocab tokens
+    logits += vocab_mask * penalty_weight
+
+    # Calculate cross-entropy loss
+    return F.cross_entropy(logits.view(-1, logits.size(-1)), labels.view(-1))
+
+# Training loop example
+num_epochs = 3
+for epoch in range(num_epochs):
+    model.train()
+    for batch in train_dataloader:
+        texts = batch['text']
+        inputs = [word_tokenizer.encode(text).ids for text in texts]
+        inputs = torch.nn.utils.rnn.pad_sequence([torch.tensor(ids, dtype=torch.long) for ids in inputs], batch_first=True)
+        labels = inputs.clone()  # Using input_ids as labels for training
+        outputs = model(inputs, labels=labels)
+        logits = outputs.logits
+
+        # Compute custom loss
+        loss = custom_loss_function(logits, labels, vocabulary_token_ids, penalty_weight=5.0)
+
+        # Backpropagation
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
 # Generate text
 input_ids = torch.tensor([input_ids], dtype=torch.long)  # Convert input_ids to a tensor
@@ -57,7 +103,7 @@ output_ids = model.generate(
     logits_processor=logits_processor,
     do_sample=True,
     temperature=0.9,
-    top_k=10,
+    top_k=1000,
     eos_token_id=vocab['[EOS]'],
     pad_token_id=vocab['[PAD]'],
 )
