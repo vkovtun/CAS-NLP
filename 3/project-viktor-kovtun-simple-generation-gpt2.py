@@ -1,10 +1,11 @@
-from transformers import AutoModelForCausalLM, GPT2TokenizerFast, LogitsProcessor, LogitsProcessorList
+from transformers import AutoModelForCausalLM, GPT2TokenizerFast, LogitsProcessor, LogitsProcessorList, TrainingArguments, Trainer
 from tokenizers import Tokenizer, models, pre_tokenizers, decoders
 import torch
 import torch.nn.functional as F
 from transformers import AdamW, get_linear_schedule_with_warmup
 from torch.utils.data import DataLoader, Dataset
 from datasets import load_dataset
+from tqdm import tqdm
 
 pre_primer = ["a", "and", "away", "big", "blue", "can", "come", "down", "find", "for", "funny", "go", "help", "here", "I", "in", "is", "it", "jump", "little", "look", "make", "me", "my", "not", "one", "play", "red", "run", "said", "see", "the", "three", "to", "two", "up", "we", "where", "yellow", "you"]
 primer = ["all", "am", "are", "at", "ate", "be", "black", "brown", "but", "came", "did", "do", "eat", "four", "get", "good", "have", "he", "into", "like", "must", "new", "no", "now", "on", "our", "out", "please", "pretty", "ran", "ride", "saw", "say", "she", "so", "soon", "that", "there", "they", "this", "too", "under", "want", "was", "well", "went", "what", "white", "who", "will", "with", "yes"]
@@ -54,18 +55,40 @@ input_ids = word_tokenizer.encode(prompt).ids
 model = AutoModelForCausalLM.from_pretrained("leroyrr/bert-base-head", is_decoder=True)
 # model = AutoModelForCausalLM.from_pretrained("vocab-transformers/distilbert-word2vec_256k-MLM_best")
 # model = AutoModelForCausalLM.from_pretrained("openai-community/gpt2")
+model.to('cuda')  # Move the model to GPU
 
-# Define the optimizer
-optimizer = AdamW(model.parameters(), lr=5e-5)
+# Load Simple English Wikipedia dataset
+dataset = load_dataset("rahular/simple-wikipedia", split="train")
+dataset = dataset.train_test_split(test_size=0.2)
+train_dataset = dataset['train']
+test_dataset = dataset['test']
 
-dataset = load_dataset("rahular/simple-wikipedia")
-split_dataset = dataset['train'].train_test_split(test_size=0.2)
-train_dataset = split_dataset['train']
-test_dataset = split_dataset['test']
+# Define the training arguments
+training_args = TrainingArguments(
+    output_dir='./results',
+    eval_strategy='no',
+    save_strategy='no',
+    learning_rate=5e-5,
+    per_device_train_batch_size=16,
+    num_train_epochs=2,
+    weight_decay=0.01,
+    logging_dir='./logs',
+    logging_steps=100,
+    save_steps=1000,
+    load_best_model_at_end=True,
+    # report_to='none'  # Disable built-in progress bars
+)
 
-train_dataloader = DataLoader(train_dataset, batch_size=2, shuffle=True)
+# Define the tokenizer function for dataset processing
+def tokenize_function(examples):
+    max_length = 512
+    return {'input_ids': [word_tokenizer.encode(text).ids[:max_length] for text in examples['text']]}
 
-# Custom loss function to add a penalty for out-of-vocabulary tokens
+# Tokenize the datasets
+train_dataset = train_dataset.map(tokenize_function, batched=True)
+train_dataset.set_format(type='torch', columns=['input_ids'])
+
+# Define a custom loss function to add a penalty for out-of-vocabulary tokens
 def custom_loss_function(logits, labels, vocab_token_ids, penalty_weight=5.0):
     # Apply penalty for out-of-vocabulary tokens
     vocab_mask = torch.full(logits.shape, -float('inf'), dtype=logits.dtype, device=logits.device)
@@ -75,28 +98,42 @@ def custom_loss_function(logits, labels, vocab_token_ids, penalty_weight=5.0):
     # Calculate cross-entropy loss
     return F.cross_entropy(logits.view(-1, logits.size(-1)), labels.view(-1))
 
-# Training loop example
-num_epochs = 3
-for epoch in range(num_epochs):
-    model.train()
-    for batch in train_dataloader:
-        texts = batch['text']
-        inputs = [word_tokenizer.encode(text).ids for text in texts]
-        inputs = torch.nn.utils.rnn.pad_sequence([torch.tensor(ids, dtype=torch.long) for ids in inputs], batch_first=True)
-        labels = inputs.clone()  # Using input_ids as labels for training
-        outputs = model(inputs, labels=labels)
+# Define a custom Trainer class to incorporate the custom loss function
+class CustomTrainer(Trainer):
+    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+        inputs = {k: v.to(self.args.device) for k, v in inputs.items()}
+        outputs = model(**inputs)
         logits = outputs.logits
-
-        # Compute custom loss
+        labels = inputs['input_ids']
         loss = custom_loss_function(logits, labels, vocabulary_token_ids, penalty_weight=5.0)
+        return (loss, outputs) if return_outputs else loss
 
-        # Backpropagation
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+# Define a custom data collator for padding
+class CustomDataCollator:
+    def __call__(self, features):
+        # Extract input_ids from each example and pad them to the same length
+        input_ids = [torch.tensor(feature['input_ids'], dtype=torch.long) for feature in features]
+        max_length = 512
+        padded_input_ids = torch.nn.utils.rnn.pad_sequence(input_ids, batch_first=True, padding_value=vocab['[PAD]'])
+        padded_input_ids = padded_input_ids[:, :max_length]  # Truncate if needed
+        return {'input_ids': padded_input_ids}
+
+data_collator = CustomDataCollator()
+
+# Initialize the Trainer
+trainer = CustomTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=test_dataset,
+    data_collator=data_collator  # Add data collator to handle padding
+)
+
+# Train the model
+trainer.train()
 
 # Generate text
-input_ids = torch.tensor([input_ids], dtype=torch.long)  # Convert input_ids to a tensor
+input_ids = torch.tensor([input_ids], dtype=torch.long).to('cuda')  # Convert input_ids to a tensor and move to GPU
 output_ids = model.generate(
     input_ids,
     max_length=50,
