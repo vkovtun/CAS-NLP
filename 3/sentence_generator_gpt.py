@@ -1,10 +1,49 @@
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, AutoModelForCausalLM, AutoTokenizer
 import torch
+from huggingface_hub import login
+
+
 
 # Load the pre-trained GPT-2 model and tokenizer
-model_name = 'gpt2-xl'  # You can also use 'gpt2-medium', 'gpt2-large', etc.
-tokenizer = GPT2Tokenizer.from_pretrained(model_name)
-model = GPT2LMHeadModel.from_pretrained(model_name)
+# model_name = 'gpt2-xl'  # You can also use 'gpt2-medium', 'gpt2-large', etc.
+# tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+# model = GPT2LMHeadModel.from_pretrained(model_name)
+
+# model_name = "meta-llama/Llama-3.3-70B-Instruct"
+# model = AutoModelForCausalLM.from_pretrained(
+#     model_name,
+#     torch_dtype="auto",
+#     device_map="auto"
+# )
+# tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+# 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
+login()
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+model_name = "openGPT-X/Teuken-7B-instruct-research-v0.4"
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    trust_remote_code=True,
+    torch_dtype=torch.bfloat16,
+)
+model = model.to(device).eval()
+tokenizer = AutoTokenizer.from_pretrained(
+    model_name,
+    use_fast=False,
+    trust_remote_code=True,
+)
+
+# model_name = "Qwen/QwQ-32B-Preview"
+# model_name = "Qwen/Qwen2.5-Coder-32B-Instruct"
+#
+# model = AutoModelForCausalLM.from_pretrained(
+#     model_name,
+#     torch_dtype="auto",
+#     device_map="auto"
+# )
+# tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 # Define your limited vocabulary
 # limited_vocab = [
@@ -21,6 +60,31 @@ grade_1 = ["after", "again", "an", "any", "as", "ask", "by", "could", "every", "
 grade_2 = ["always", "around", "because", "been", "before", "best", "both", "buy", "call", "cold", "does", "don't", "fast", "first", "five", "found", "gave", "goes", "green", "its", "made", "many", "off", "or", "pull", "read", "right", "sing", "sit", "sleep", "tell", "their", "these", "those", "upon", "us", "use", "very", "wash", "which", "why", "wish", "work", "would", "write", "your"]
 grade_3 = ["about", "better", "bring", "carry", "clean", "cut", "done", "draw", "drink", "eight", "fall", "far", "full", "got", "grow", "hold", "hot", "hurt", "if", "keep", "kind", "laugh", "light", "long", "much", "myself", "never", "only", "own", "pick", "seven", "shall", "show", "six", "small", "start", "ten", "today", "together", "try", "warm"]
 nouns = ["apple", "baby", "back", "ball", "bear", "bed", "bell", "bird", "birthday", "boat", "box", "boy", "bread", "brother", "cake", "car", "cat", "chair", "chicken", "children", "Christmas", "coat", "corn", "cow", "day", "dog", "doll", "door", "duck", "egg", "eye", "farm", "farmer", "father", "feet", "fire", "fish", "floor", "flower", "game", "garden", "girl", "goat", "grass", "ground", "hand", "head", "hill", "home", "horse", "house", "kitty", "leg", "letter", "man", "men", "milk", "money", "morning", "mother", "name", "nest", "night", "paper", "party", "picture", "pig", "rabbit", "rain", "ring", "robin", "Santa Claus", "school", "seed", "sheep", "shoe", "sister", "snow", "song", "squirrel", "stick", "street", "sun", "table", "thing", "time", "top", "toy", "tree", "watch", "water", "way", "wind", "window", "woman", "women", "wood"]
+
+# pre_primer = ["", "і", "далеко", "великий", "синій", "можна", "приходь", "вниз", "знайти", "для", "смішний", "йти", "допомогти", "тут", "я", "в", "є",
+#               "це", "стрибати", "маленький", "дивитися", "робити", "мене", "мій", "не", "один", "грати", "червоний", "бігти", "сказав", "бачити", "",
+#               "три", "до", "два", "вгору", "ми", "де", "жовтий", "ти"]
+# primer = ["все", "", "є", "на", "з'їв", "бути", "чорний", "коричневий", "але", "прийшов", "зробив", "робити", "їсти", "чотири", "отримати", "добрий",
+#           "мати", "він", "в", "подобатися", "повинен", "новий", "ні", "зараз", "на", "наш", "зовні", "будь ласка", "гарний", "біг", "їздити",
+#           "побачив", "казати", "вона", "так", "скоро", "той", "там", "вони", "це", "також", "під", "хотіти", "був", "добре", "пішов", "що", "білий",
+#           "хто", "буде", "з", "так"]
+# grade_1 = ["після", "знову", "", "будь-який", "як", "питати", "від", "міг", "кожний", "літати", "з", "дати", "йду", "мав", "має", "її", "його",
+#            "його", "як", "просто", "знати", "дозволити", "жити", "може", "з", "старий", "одного разу", "відкрити", "над", "покласти", "круглий",
+#            "деякі", "зупинити", "брати", "дякую", "їх", "тоді", "думати", "ходити", "були", "коли"]
+# grade_2 = ["завжди", "навколо", "тому що", "був", "до", "найкращий", "обидва", "купити", "дзвонити", "холодний", "робить", "не", "швидкий",
+#            "перший", "п'ять", "знайшов", "дав", "йде", "його", "зробив", "багато", "від", "або", "тягнути", "читати", "правий", "співати", "сидіти",
+#            "спати", "сказати", "їх", "ці", "ті", "на", "нам", "використовувати", "дуже", "мити", "який", "чому", "бажати", "працювати", "би",
+#            "писати", "твій"]
+# grade_3 = ["про", "кращий", "принести", "нести", "чистий", "різати", "зроблено", "малювати", "пити", "вісім", "падати", "далеко", "повний", "отримав",
+#            "рости", "тримати", "гарячий", "боліти", "якщо", "тримати", "добрий", "сміятися", "світло", "довгий", "багато", "сам", "ніколи", "тільки",
+#            "власний", "вибирати", "сім", "буду", "показати", "шість", "маленький", "почати", "десять", "сьогодні", "разом", "пробувати", "теплий"]
+# nouns = ["яблуко", "дитина", "спина", "м'яч", "ведмідь", "ліжко", "дзвін", "птах", "день народження", "човен", "коробка", "хлопчик", "хліб", "брат",
+#          "торт", "машина", "кіт", "стілець", "курка", "діти", "Різдво", "пальто", "кукурудза", "корова", "день", "собака", "лялька", "двері", "качка",
+#          "яйце", "око", "ферма", "фермер", "батько", "ноги", "вогонь", "риба", "підлога", "квітка", "гра", "сад", "дівчинка", "коза", "трава",
+#          "земля", "рука", "голова", "пагорб", "дім", "кінь", "будинок", "кошеня", "нога", "лист", "чоловік", "чоловіки", "молоко", "гроші", "ранок",
+#          "мати", "ім'я", "гніздо", "ніч", "папір", "вечірка", "картина", "свиня", "кролик", "дощ", "кільце", "малинівка", "Святий Миколай", "школа",
+#          "насіння", "вівця", "взуття", "сестра", "сніг", "пісня", "білка", "палиця", "вулиця", "сонце", "стіл", "річ", "час", "верх", "іграшка",
+#          "дерево", "годинник", "вода", "шлях", "вітер", "вікно", "жінка", "жінки", "деревина"]
 
 limited_vocab = pre_primer + primer + grade_1 + grade_2 + grade_3 + nouns
 
@@ -57,7 +121,7 @@ def generate_constrained_text(prompt, max_length=100):
         input_ids,
         max_length=max_length,
         do_sample=True,
-        temperature=0.4,
+        temperature=0.9,
         top_k=50,
         top_p=0.95,
         bad_words_ids=bad_words_ids,
@@ -69,6 +133,11 @@ def generate_constrained_text(prompt, max_length=100):
     return generated_text
 
 # Generate a story
-prompt = "Long time ago"
-story = generate_constrained_text(prompt, max_length=35)
+prompt = "Long time ago,"
+# prompt = "Колись давно"
+story = generate_constrained_text(prompt, max_length=50)
 print(story)
+
+# Next steps
+# - Try another model (LLAMA)
+# - Think about performance metrics - words out of vocabulary, syntactic accuracy and semantic accuracy.
