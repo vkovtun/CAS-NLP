@@ -1,18 +1,37 @@
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
-import torch
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, StoppingCriteriaList, MaxLengthCriteria, EosTokenCriteria
+
+
+# Function to generate text with constrained vocabulary
+def generate_constrained_text(prompt, max_length=100):
+    input_ids = tokenizer.encode(prompt, return_tensors='pt')
+    output = model.generate(
+        input_ids,
+        max_length=max_length,
+        do_sample=True,
+        temperature=0.4,
+        top_k=50,
+        top_p=0.95,
+        bad_words_ids=bad_words_ids,
+        repetition_penalty=1.2,
+        pad_token_id=tokenizer.eos_token_id,
+        eos_token_id=tokenizer.eos_token_id
+    )
+    generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
+    return generated_text
+
 
 # Load the pre-trained GPT-2 model and tokenizer
 model_name = 'gpt2-xl'  # You can also use 'gpt2-medium', 'gpt2-large', etc.
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
 model = GPT2LMHeadModel.from_pretrained(model_name)
 
-# Define your limited vocabulary
+# # Define your limited vocabulary
 # limited_vocab = [
-#     'dog', 'cat', 'man', 'woman', 'child', 'said', 'went', 'came', 'saw',
-#     'was', 'were', 'on', 'in', 'with', 'and', 'but', 'the', 'a', 'an', 'to',
-#     'of', 'for', 'it', 'he', 'she', 'they', 'had', 'has', 'have', 'that',
-#     'as', 'at', 'from', 'by', 'her', 'his', 'house', 'day', 'night', 'walked',
-#     'looked', 'found', 'thought', 'knew', 'felt', 'time', 'world', 'story'
+#     'dog', 'cat', 'man', 'woman', 'child', 'say', 'go', 'come', 'see',
+#     'is', 'on', 'in', 'with', 'and', 'but', 'the', 'a', 'an', 'to',
+#     'of', 'for', 'it', 'he', 'she', 'they', 'have', 'that',
+#     'as', 'at', 'from', 'by', 'her', 'his', 'house', 'day', 'night', 'walk',
+#     'look', 'find', 'think', 'know', 'feel', 'time', 'world', 'story'
 # ]
 
 pre_primer = ["a", "and", "away", "big", "blue", "can", "come", "down", "find", "for", "funny", "go", "help", "here", "I", "in", "is", "it", "jump", "little", "look", "make", "me", "my", "not", "one", "play", "red", "run", "said", "see", "the", "three", "to", "two", "up", "we", "where", "yellow", "you"]
@@ -50,25 +69,7 @@ forbidden_token_ids = all_token_ids - allowed_token_ids
 # Convert forbidden token IDs into the format required by 'bad_words_ids'
 bad_words_ids = [[token_id] for token_id in forbidden_token_ids]
 
-# Function to generate text with constrained vocabulary
-def generate_constrained_text(prompt, max_length=100):
-    input_ids = tokenizer.encode(prompt, return_tensors='pt')
-    output = model.generate(
-        input_ids,
-        max_length=max_length,
-        do_sample=True,
-        temperature=0.4,
-        top_k=50,
-        top_p=0.95,
-        bad_words_ids=bad_words_ids,
-        repetition_penalty=1.2,
-        pad_token_id=tokenizer.eos_token_id,
-        eos_token_id=tokenizer.eos_token_id
-    )
-    generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
-    return generated_text
-
 # Generate a story
 prompt = "Long time ago"
-story = generate_constrained_text(prompt, max_length=35)
+story = generate_constrained_text(prompt, max_length=50)
 print(story)
