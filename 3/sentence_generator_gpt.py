@@ -1,9 +1,11 @@
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
+import statistics
+
+import language_tool_python
 import nltk
-from nltk.tokenize import word_tokenize
 from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
-import statistics
+from nltk.tokenize import word_tokenize
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 
 # Function to generate text with constrained vocabulary
@@ -43,12 +45,12 @@ def get_wordnet_pos(tag):
 
 
 # Function to tokenize and lemmatize
-def process_sentence(sentence):
+def process_text(text):
     # Initialize lemmatizer
     lemmatizer = WordNetLemmatizer()
 
-    # Tokenize the sentence
-    tokens = word_tokenize(sentence)
+    # Tokenize the text
+    tokens = word_tokenize(text)
 
     # Lowercase and remove punctuation
     tokens = [word.lower() for word in tokens if word.isalpha()]
@@ -63,13 +65,24 @@ def process_sentence(sentence):
 
 
 # Function that computes how many words are from the vocabulary
-def compute_accuracy(sentence, vocabulary):
-    lemmatized_tokens = process_sentence(sentence)
+def compute_accuracy(text, vocabulary):
+    lemmatized_tokens = process_text(text)
     values = list(map(lambda token: 1 if token in vocabulary else 0, lemmatized_tokens))
     for index, value in enumerate(values):
         if value == 0:
             print(f"Missing token: {lemmatized_tokens[index]}")
     return statistics.mean(values)
+
+
+# Syntax evaluation function.
+def evaluate_syntax(text):
+    tool = language_tool_python.LanguageTool('en-US')  # Specify language
+    matches = tool.check(text)
+
+    for error in matches:
+        print(f"Error: {error.message} at position {error.offset} in '{error.context}'")
+
+    return len(matches)
 
 
 # Load the pre-trained GPT-2 model and tokenizer
@@ -138,6 +151,8 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('averaged_perceptron_tagger_eng')
 
 for i in range(5):
-    story = generate_constrained_text(prompt, max_length=50)
-    print(f"{i + 1}: {story}")
-    print(f"Vocabulary accuracy: {compute_accuracy(story, limited_vocab)}")
+    text = generate_constrained_text(prompt, max_length=50)
+    print(f"{i + 1}: {text}")
+    print(f"Vocabulary accuracy: {compute_accuracy(text, limited_vocab)}")
+    print(f"Syntactic errors count: {evaluate_syntax(text=text)}")
+    print
