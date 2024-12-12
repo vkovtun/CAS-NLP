@@ -1,5 +1,5 @@
 import statistics
-
+import torch
 import language_tool_python
 import nltk
 from nltk.corpus import wordnet
@@ -18,11 +18,11 @@ def generate_constrained_text(prompt, max_length=100):
         attention_mask=attention_mask,
         max_length=max_length,
         do_sample=True,
-        temperature=0.9,
-        top_k=50,
+        temperature=0.8,
+        top_k=20,
         top_p=0.95,
         bad_words_ids=bad_words_ids,
-        repetition_penalty=1.2,
+        repetition_penalty=1.3,
         pad_token_id=tokenizer.eos_token_id,
         eos_token_id=tokenizer.eos_token_id
     )
@@ -85,6 +85,18 @@ def evaluate_syntax(text):
     return len(matches)
 
 
+# Calculates perplexity of the text. The lower, the better.
+def compute_perplexity(tokenizer, model, text):
+    model.eval()
+
+    tokenize_input = tokenizer.encode(text, return_tensors='pt')
+    with torch.no_grad():
+        outputs = model(tokenize_input, labels=tokenize_input)
+        loss = outputs.loss
+        perplexity = torch.exp(loss)
+        return perplexity.item()
+
+
 # Load the pre-trained GPT-2 model and tokenizer
 model_name = 'gpt2-xl'  # You can also use 'gpt2-medium', 'gpt2-large', etc.
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
@@ -107,8 +119,8 @@ primer = ["all", "am", "are", "at", "ate", "be", "black", "brown", "but", "came"
 grade_1 = ["after", "again", "an", "any", "as", "ask", "by", "could", "every", "fly", "from", "give", "going", "had", "has", "her", "him", "his", "how", "just", "know", "let", "live", "may", "of", "old", "once", "open", "over", "put", "round", "some", "stop", "take", "thank", "them", "then", "think", "walk", "were", "when"]
 grade_2 = ["always", "around", "because", "been", "before", "best", "both", "buy", "call", "cold", "does", "don't", "fast", "first", "five", "found", "gave", "goes", "green", "its", "made", "many", "off", "or", "pull", "read", "right", "sing", "sit", "sleep", "tell", "their", "these", "those", "upon", "us", "use", "very", "wash", "which", "why", "wish", "work", "would", "write", "your"]
 grade_3 = ["about", "better", "bring", "carry", "clean", "cut", "done", "draw", "drink", "eight", "fall", "far", "full", "got", "grow", "hold", "hot", "hurt", "if", "keep", "kind", "laugh", "light", "long", "much", "myself", "never", "only", "own", "pick", "seven", "shall", "show", "six", "small", "start", "ten", "today", "together", "try", "warm"]
-nouns = ["apple", "baby", "back", "ball", "bear", "bed", "bell", "bird", "birthday", "boat", "box", "boy", "bread", "brother", "cake", "car", "cat", "chair", "chicken", "children", "christmas", "coat", "corn", "cow", "day", "dog", "doll", "door", "duck", "egg", "eye", "farm", "farmer", "father", "feet", "fire", "fish", "floor", "flower", "game", "garden", "girl", "goat", "grass", "ground", "hand", "head", "hill", "home", "horse", "house", "kitty", "leg", "letter", "man", "men", "milk", "money", "morning", "mother", "name", "nest", "night", "paper", "party", "picture", "pig", "rabbit", "rain", "ring", "robin", "santa", "school", "seed", "sheep", "shoe", "sister", "snow", "song", "squirrel", "stick", "street", "sun", "table", "thing", "time", "top", "toy", "tree", "watch", "water", "way", "wind", "window", "woman", "women", "wood"]
-extra = ["ago", "child"]
+nouns = ["apple", "baby", "back", "ball", "bear", "bed", "bell", "bird", "birthday", "boat", "box", "boy", "bread", "brother", "cake", "car", "cat", "chair", "chicken", "children", "christmas", "coat", "corn", "cow", "day", "dog", "doll", "door", "duck", "egg", "eye", "farm", "farmer", "father", "foot", "fire", "fish", "floor", "flower", "game", "garden", "girl", "goat", "grass", "ground", "hand", "head", "hill", "home", "horse", "house", "kitty", "leg", "letter", "man", "men", "milk", "money", "morning", "mother", "name", "nest", "night", "paper", "party", "picture", "pig", "rabbit", "rain", "ring", "robin", "santa", "school", "seed", "sheep", "shoe", "sister", "snow", "song", "squirrel", "stick", "street", "sun", "table", "thing", "time", "top", "toy", "tree", "watch", "water", "way", "wind", "window", "woman", "women", "wood"]
+extra = ["ago", "child", "u"]
 
 limited_vocab = pre_primer + primer + grade_1 + grade_2 + grade_3 + nouns + extra
 
@@ -136,11 +148,6 @@ forbidden_token_ids = all_token_ids - allowed_token_ids
 # Convert forbidden token IDs into the format required by 'bad_words_ids'
 bad_words_ids = [[token_id] for token_id in forbidden_token_ids]
 
-# Generate a story
-prompt = "Long time ago"
-# story = generate_constrained_text(prompt, max_length=50)
-# print(story)
-
 # Evaluation
 
 # Downloading required datasets
@@ -150,9 +157,11 @@ nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('averaged_perceptron_tagger_eng')
 
+prompt = "Long time ago"
 for i in range(5):
     text = generate_constrained_text(prompt, max_length=50)
     print(f"{i + 1}: {text}")
     print(f"Vocabulary accuracy: {compute_accuracy(text, limited_vocab)}")
     print(f"Syntactic errors count: {evaluate_syntax(text=text)}")
-    print
+    print(f"Perplexity: {compute_perplexity(tokenizer=tokenizer, model=model, text=text)}")
+    print()
