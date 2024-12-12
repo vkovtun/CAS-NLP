@@ -7,6 +7,8 @@ from torch.utils.data import DataLoader, Dataset
 from datasets import load_dataset
 from tqdm import tqdm
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 pre_primer = ["a", "and", "away", "big", "blue", "can", "come", "down", "find", "for", "funny", "go", "help", "here", "I", "in", "is", "it", "jump", "little", "look", "make", "me", "my", "not", "one", "play", "red", "run", "said", "see", "the", "three", "to", "two", "up", "we", "where", "yellow", "you"]
 primer = ["all", "am", "are", "at", "ate", "be", "black", "brown", "but", "came", "did", "do", "eat", "four", "get", "good", "have", "he", "into", "like", "must", "new", "no", "now", "on", "our", "out", "please", "pretty", "ran", "ride", "saw", "say", "she", "so", "soon", "that", "there", "they", "this", "too", "under", "want", "was", "well", "went", "what", "white", "who", "will", "with", "yes"]
 grade_1 = ["after", "again", "an", "any", "as", "ask", "by", "could", "every", "fly", "from", "give", "going", "had", "has", "her", "him", "his", "how", "just", "know", "let", "live", "may", "of", "old", "once", "open", "over", "put", "round", "some", "stop", "take", "thank", "them", "then", "think", "walk", "were", "when"]
@@ -51,8 +53,8 @@ prompt = "Here is a sentence:"
 input_ids = word_tokenizer.encode(prompt).ids
 
 # Load a word-level compatible model
-# model = AutoModelForCausalLM.from_pretrained("leroyrr/roberta-ulmfit", is_decoder=True)
-model = AutoModelForCausalLM.from_pretrained("leroyrr/bert-base-head", is_decoder=True)
+model = AutoModelForCausalLM.from_pretrained("leroyrr/roberta-ulmfit", is_decoder=True)
+# model = AutoModelForCausalLM.from_pretrained("leroyrr/bert-base-head", is_decoder=True)
 # model = AutoModelForCausalLM.from_pretrained("vocab-transformers/distilbert-word2vec_256k-MLM_best")
 # model = AutoModelForCausalLM.from_pretrained("openai-community/gpt2")
 model.to('cuda')  # Move the model to GPU

@@ -1,11 +1,14 @@
-from transformers import GPT2LMHeadModel, GPT2Tokenizer, StoppingCriteriaList, MaxLengthCriteria, EosTokenCriteria
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 
 # Function to generate text with constrained vocabulary
 def generate_constrained_text(prompt, max_length=100):
     input_ids = tokenizer.encode(prompt, return_tensors='pt')
+    attention_mask = (input_ids != tokenizer.pad_token_id).long()
+
     output = model.generate(
         input_ids,
+        attention_mask=attention_mask,
         max_length=max_length,
         do_sample=True,
         temperature=0.4,
@@ -24,6 +27,9 @@ def generate_constrained_text(prompt, max_length=100):
 model_name = 'gpt2-xl'  # You can also use 'gpt2-medium', 'gpt2-large', etc.
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
 model = GPT2LMHeadModel.from_pretrained(model_name)
+
+# Ensure pad_token_id is set to eos_token_id if not already
+tokenizer.pad_token_id = tokenizer.eos_token_id
 
 # # Define your limited vocabulary
 # limited_vocab = [
@@ -46,7 +52,7 @@ limited_vocab = pre_primer + primer + grade_1 + grade_2 + grade_3 + nouns
 # with open('en_top_3000.txt', 'r') as file:
 #     limited_vocab = [line.strip() for line in file]
 
-punctuation=[".", ",", "?", "!", ";", ":", "-", "(", ")", "'", '"']
+punctuation = [".", ",", "?", "!", ";", ":", "-", "(", ")", "'", '"']
 limited_vocab += punctuation
 
 
@@ -73,3 +79,4 @@ bad_words_ids = [[token_id] for token_id in forbidden_token_ids]
 prompt = "Long time ago"
 story = generate_constrained_text(prompt, max_length=50)
 print(story)
+
