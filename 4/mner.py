@@ -87,38 +87,25 @@ def tokens_to_text_with_tags(tokens, tags):
     return sentence, entities
 
 
-def get_qid_to_wikidata_map():
-    result = {}
-    with open('wikidata_tags.csv', 'r', newline='') as csvfile:
-        csv_reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-        for qid, tag in csv_reader:
-            if qid:
-                result[int(qid)] = tag
-    return result
-
-
-qid_to_wikidata_map = get_qid_to_wikidata_map()
-
-
-def get_numbers_set(file_path):
+def get_lines_set(file_path):
     """
-    Gets a set of numbers from a path.
+    Gets a set of lines from a path.
 
     :param file_path: The file to read from.
-    :return:
+    :return: A set of lines from the file.
     """
-    number_set = set()
+    lines_set = set()
     with open(file_path, 'r') as file:
         for line in file:
             # Remove leading/trailing spaces and check if the line is not empty
             line = line.strip()
             if line:
-                number_set.add(line)
-    return number_set
+                lines_set.add(line)
+    return lines_set
 
-PER_WIKIDATA_ENTITIES = get_numbers_set('PER-ND.txt') | get_numbers_set('PER-FI.txt')
-LOC_WIKIDATA_ENTITIES = get_numbers_set('LOC-ND.txt')
-ORG_WIKIDATA_ENTITIES = get_numbers_set('ORG-ND.txt')
+PER_WIKIDATA_ENTITIES = get_lines_set('PER-ND.txt') | get_lines_set('PER-FI.txt')
+LOC_WIKIDATA_ENTITIES = get_lines_set('LOC-ND.txt')
+ORG_WIKIDATA_ENTITIES = get_lines_set('ORG-ND.txt')
 
 
 def get_entity_by_qid(qid):
@@ -138,37 +125,14 @@ def get_entity_by_qid(qid):
     else:
         return 'MISC'
 
-# def convert_row_to_ner_format(row):
-#     entity_list = []
-#     for anchor in row["paragraph_anchors"]:
-#         start = anchor.get("start")
-#         end = anchor.get("end")
-#         label = anchor.get("title")
-#         if None not in (start, end, label):
-#             entity_list.append({
-#                 "start": start,
-#                 "end": end,
-#                 "label": label,
-#             })
-#     return {
-#         "text": row["paragraph_text"],
-#         "entities": entity_list  # now a list of dicts
-#     }
-
 
 def convert_row_wikianc(row):
     entities = []
     for anchor in row['paragraph_anchors']:
-        # get the offsets (could be string, float, etc.)
         start_raw = anchor.get('start')
         end_raw = anchor.get('end')
         qid = anchor.get('qid')
-        # label = qid_to_wikidata_map.get(qid, 'MISC')
         label = get_entity_by_qid(str(qid))
-        # print(f"start_raw={start_raw}, type(start_raw)={type(start_raw)}")
-        # print(f"start_raw={end_raw}, type(start_raw)={type(end_raw)}")
-        # print(f"qid={qid}, type(qid)={type(qid)}")
-        # print(f"label={label}, type(label)={type(label)}")
 
         # skip if any are None
         if start_raw is None or end_raw is None or label is None:
@@ -179,7 +143,7 @@ def convert_row_wikianc(row):
             start = int(start_raw)
             end = int(end_raw)
         except ValueError:
-            # if you can't convert them to int, skip or handle differently
+            # if you can't convert them to int, skip
             print(f"start_raw={start_raw}, type(start_raw)={type(start_raw)}")
             print(f"start_raw={end_raw}, type(start_raw)={type(end_raw)}")
             continue
@@ -197,100 +161,8 @@ def convert_row_wikianc(row):
     return data_point
 
 
-def convert_row_mapa(row):
-    tokens = row['tokens']
-    tags = row['coarse_grained']
-
-    if len(tokens) != len(tags):
-        raise ValueError(f"Sizes of tokens and tags are not equal, sentence_number: {row['sentence_number']}. len(tokens)={len(tokens)}, len(tags)={len(tags)}")
-
-    text, entities = tokens_to_text_with_tags(tokens, tags)
-
-    data_point = {
-        'text': text,
-        'entities': entities,
-    }
-    return data_point
-
-
-# def create_spacy_doc_bin_file(dataset, file_name, language):
-#     nlp = spacy.blank(language)
-#     db = DocBin()
-#     for i in tqdm(range(0, len(dataset))):
-#         datum = dataset[i]
-#         text = datum['text']
-#         doc = nlp(text)
-#         ents = []
-#         for start, end, label in datum.get('entities'):
-#             span = doc.char_span(start, end, label=label)
-#             ents.append(span)
-#         doc.ents = ents
-#         db.add(doc)
-#     db.to_disk(file_name)
-
-
-def create_spacy_doc_bin_files_safe(dataset, output_dir, file_name, language, chunk_size=2000):
+def create_spacy_doc_bin_files(dataset, output_dir, file_name, language, chunk_size=5000):
     os.makedirs(output_dir, exist_ok=True)  # Ensure output directory exists
-
-    nlp = spacy.blank(language)
-    total_docs = len(dataset)
-    file_index = 0
-
-    for i in tqdm(range(0, total_docs, chunk_size)):
-        db = DocBin()
-        for j in range(i, min(i + chunk_size, total_docs)):
-            datum = dataset[j]
-            text = datum['text']
-            doc = nlp(text)
-            ents = []
-            for entities in datum.get('entities', []):
-                start_raw = entities.get('start')
-                end_raw = entities.get('end')
-                label = entities.get('label')
-
-                # skip if any are None
-                if start_raw is None or end_raw is None or label is None:
-                    continue
-
-                # ensure these are actually integers
-                try:
-                    start = int(start_raw)
-                    end = int(end_raw)
-                except ValueError:
-                    # if you can't convert them to int, skip or handle differently
-                    print(f"start_raw={start_raw}, type(start_raw)={type(start_raw)}")
-                    print(f"start_raw={end_raw}, type(start_raw)={type(end_raw)}")
-                    continue
-
-                span = doc.char_span(start, end, label=label)
-                if span is not None:
-                    ents.append(span)
-
-            # Discard overlapping entities and keep the longest one
-            ents = sorted(ents, key=lambda x: (x.start, -x.end + x.start))
-            filtered_ents = []
-            for ent in ents:
-                if not filtered_ents or ent.start >= filtered_ents[-1].end:
-                    filtered_ents.append(ent)
-
-            try:
-                doc.ents = filtered_ents
-            except ValueError as ex:
-                print(f"ValueError raised.")
-                print(f"filtered_ents={filtered_ents}, text={text}")
-                raise ex
-            db.add(doc)
-
-        # Save the chunk to a new file
-        output_file = os.path.join(output_dir, f'{file_name}{file_index + 1}.spacy')
-        db.to_disk(output_file)
-        file_index += 1
-
-
-def create_spacy_doc_bin_files(dataset, output_dir, file_name, language, chunk_size=20000):
-    os.makedirs(output_dir, exist_ok=True)  # Ensure output directory exists
-
-    # TO_DEFAULT_SPACY_MAP = {'ORGANISATION': 'ORG', 'ADDRESS': 'LOC', 'DATE': 'MISC', 'PERSON': 'PER', 'AMOUNT': 'MISC', 'TIME': 'MISC'}
 
     nlp = spacy.blank(language)
     docs_limit = len(dataset)
@@ -308,18 +180,20 @@ def create_spacy_doc_bin_files(dataset, output_dir, file_name, language, chunk_s
                 end = entities.get('end')
                 label = entities.get('label')
 
-
-                # span = doc.char_span(start, end, label=TO_DEFAULT_SPACY_MAP.get(label, 'MISC'))
                 span = doc.char_span(start, end, label=label)
 
-                if text[start].isspace():
-                    print(f"Entity span '{text[start:end]}' has leading whitespace. Skipping.")
-                    print(f"Text: '{text}'")
-                    span = None
+                try:
+                    if text[start].isspace():
+                        print(f"Entity span '{text[start:end]}' has leading whitespace. Skipping.")
+                        print(f"Text: '{text}'")
+                        span = None
 
-                if text[end - 1].isspace():
-                    print(f"Entity span '{text[start:end]}' has trailing whitespace. Skipping.")
-                    print(f"Text: '{text}'")
+                    if text[end - 1].isspace():
+                        print(f"Entity span '{text[start:end]}' has trailing whitespace. Skipping.")
+                        print(f"Text: '{text}'")
+                        span = None
+                except IndexError:
+                    print(f"Index is out of range. start: {start}, end: {end}, test: '{text}'")
                     span = None
 
                 if span is not None:
@@ -348,16 +222,13 @@ def create_spacy_doc_bin_files(dataset, output_dir, file_name, language, chunk_s
 
 
 def create_spacy_files(data_source, language):
-    train_ner = data_source['train'].shuffle().select(range(800000)).map(convert_row_wikianc)
-    # train_ner = data_source['train'].shuffle().map(convert_row_mapa)
+    train_ner = data_source['train'].shuffle().select(range(min(3200000, len(data_source['train'])))).map(convert_row_wikianc)
     create_spacy_doc_bin_files(dataset=train_ner, file_name='train', output_dir=f'./{language}/train', language='xx')
 
-    dev_ner = data_source['test'].shuffle().select(range(240000)).map(convert_row_wikianc)
-    # dev_ner = data_source['test'].shuffle().map(convert_row_mapa)
+    dev_ner = data_source['test'].shuffle().select(range(min(960000, len(data_source['test'])))).map(convert_row_wikianc)
     create_spacy_doc_bin_files(dataset=dev_ner, file_name='dev', output_dir=f'./{language}/dev', language='xx')
 
-    valid_ner = data_source['validation'].shuffle().select(range(120000)).map(convert_row_wikianc)
-    # valid_ner = data_source['validation'].shuffle().map(convert_row_mapa)
+    valid_ner = data_source['validation'].shuffle().select(range(480000, len(data_source['validation']))).map(convert_row_wikianc)
     create_spacy_doc_bin_files(dataset=valid_ner, file_name='validation', output_dir=f'./{language}/validation', language='xx')
 
 
@@ -365,19 +236,9 @@ def create_spacy_files(data_source, language):
 
 
 en_ds = load_and_split_ds('cyanic-selkie/wikianc', 'en')
-# en_ds = datasets.load_dataset('dglover1/mapa-eur-lex', 'default').filter(lambda row: row['language'] == 'en')
-
 cs_ds = load_and_split_ds('cyanic-selkie/wikianc', 'cs')
 hu_ds = load_and_split_ds('cyanic-selkie/wikianc', 'hu')
-
-
-# SpaCy Built-In Entity Types
-#
-#     LOC - Countries, cities, states, mountain ranges, bodies of water.
-#     ORG - Companies, agencies, institutions, etc.
-#     PER - People, including fictional.
-#     MISC - Other categories.
-
+uk_ds = load_and_split_ds('cyanic-selkie/wikianc', 'uk')
 
 # SpaCy Transformers off the Shelf Model
 
@@ -438,13 +299,24 @@ Az 1914–1945 közötti időszakot egyesek a második harmincéves háború id�
 
 visualize_entities(hu_text, model)
 
+# uk_text = """
+# Друга світова війна - глобальний збройний конфлікт, що тривав від 1 вересня 1939 року до 2 вересня 1945 року. У війні взяло участь понад 60 країн, зокрема всі великі держави, які утворили два протилежні військові табори: блок країн Осі та антигітлерівську коаліцію («союзники»). Безпосередню участь у бойових діях брали понад 100 мільйонів осіб. Супротивні держави кинули всі економічні, промислові та наукові можливості на потреби фронту, стираючи різницю між цивільними та військовими ресурсами. Загальні людські втрати коливаються між 50 й 80 мільйонами осіб, більшість із яких були мешканцями Радянського Союзу та Китаю. Друга світова війна відзначилася численними масовими вбивствами і злочинами проти людяності, насамперед Голокостом, стратегічними килимовими бомбардуваннями та єдиним в історії військовим застосуванням ядерної зброї.
+# Основними причинами війни стали політичні суперечності, породжені недосконалою Версальською системою, та агресивна експансіоністська політика нацистської Німеччини, Японської імперії та Італії. 1 вересня 1939 року гітлерівські війська вторглися в Польщу. 3 вересня Велика Британія та Франція оголосили Німеччині війну. Упродовж 1939—1941 років завдяки серії успішних військових кампаній та низки дипломатичних заходів Німеччина захопила більшу частину континентальної Європи. Саме тоді й Радянський Союз анексував (повністю або частково) території сусідніх європейських держав: Польщі, Румунії, Фінляндії та країн Балтії, що відійшли до його сфери впливу на підставі Пакту Молотова — Ріббентропа. Після початку бойових дій у Північній Африці та падіння Франції в середині 1940 року війна тривала насамперед між країнами Осі та Великою Британією, повітряні сили якої зуміли відбити німецькі повітряні атаки. У цей же час бойові дії поширились на Балканський півострів та Атлантичний океан. Японія окупувала частину Китаю та Південно-Східної Азії, взявши під контроль важливі джерела сировини.
+# 22 червня 1941 року війська країн Осі чисельністю 3.5 мільйонів осіб вторглися в Радянський Союз, маючи на меті завоювання «життєвого простору» в Східній Європі. Відкривши найбільший в історії сухопутний фронт, німецькі війська спершу доволі швидко окупували західні регіони СРСР, однак в битві за Москву зазнали поразки. В цей же час Японія віроломно напала на США та підкорила західну частину Тихого океану. Задля протистояння агресії країн Осі створено Антигітлерівську коаліцію 26 країн, в окупованих країнах розгорнувся рух опору. У лютому 1943 радянська армія здобула перемогу під Сталінградом. У Північній Африці німецькі та італійські війська зазнали поразки під Ель-Аламейном. Просування Японії зупинили сили американців і австралійців у битві за Мідвей. У 1943 році після низки військових невдач Гітлера на Східному фронті, висадки союзників у Сицилії та Італії, що призвело до капітуляції останньої, і перемог США на Тихому океані, країни Осі втратили ініціативу та перейшли до стратегічного відступу на всіх фронтах. У 1944 році армії західних альянтів визволили Західну та Центральну Європу, у той час як радянські війська вигнали війська Німеччини та окупантів з власної території та країн Східної й Південно-Східної Європи.
+# Протягом 1944 та 1945 років Японія зазнала великих втрат у материковій Азії, у Південному Китаї та Бірмі; союзники знищили японський флот і заволоділи ключовими островами в західній частині Тихого океану. Німеччина опинилася в щільному кільці. До кінця квітня 1945 року радянські війська заволоділи значною частиною її території, зокрема й Берліном; Адольф Гітлер вчинив самогубство. 8 травня керівництво Вермахту підписало Акт про беззастережну капітуляцію. Ця дата вважається Днем перемоги над нацизмом в Європі. Після опублікування 26 липня 1945 Потсдамської декларації та відмови Японії капітулювати на її умовах США скинули атомні бомби на міста Хіросіму і Нагасакі 6 і 9 серпня відповідно. У серпні 1945 Радянський Союз розгорнув бойові дії проти Японії. Неминуче вторгнення американців на японський архіпелаг, а також можливість інших атомних бомбардувань змусили керівництво цієї острівної країни здатися. Акт про капітуляцію Японії підписали 2 вересня 1945 року на борту лінкора «Міссурі». Війна в Азії закінчилась, закріпивши загальну перемогу Антигітлерівської коаліції.
+# Друга світова стала наймасштабнішою та найкривавішою війною в історії людства, великим переламом XX століття, що докорінно змінив політичну карту і соціальну структуру світу. Для сприяння розвитку міжнародного співробітництва та запобігання майбутнім конфліктам створено Організацію Об'єднаних Націй. Післявоєнний порядок утвердив гегемонію Сполучених Штатів і Радянського Союзу, суперництво яких призвело до утворення капіталістичного й соціалістичного таборів та початку Холодної війни. Світовий вплив європейських держав значно ослаб, почався процес деколонізації Азії та Африки. Перед країнами, чиї галузі економіки були знищені, гостро стояла проблема їхнього відновлення. У Європі поряд з цим постало питання європейської інтеграції як способу подолання ворожнечі й створення спільної ідентичності.
+# """
+#
+# visualize_entities(uk_text, model)
+
 # Training Model
 
 ## Document Files Initialization
 
-# create_spacy_files(en_ds,'en')
-# create_spacy_files(cs_ds,'cs')
+create_spacy_files(en_ds,'en')
+create_spacy_files(cs_ds,'cs')
 create_spacy_files(hu_ds,'hu')
+# create_spacy_files(uk_ds,'uk')
 
 # Run  python -m spacy train config_mapa_en_1.cfg --output model_mapa_en_1 --gpu-id 0
 
