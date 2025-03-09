@@ -8,6 +8,21 @@ from datasets import DatasetDict
 from spacy.tokens import DocBin
 from tqdm import tqdm
 
+def load_ds(path, name, language):
+    ds = datasets.load_dataset(path, name)
+
+    # Filter dataset for the specified language
+    def filter_by_language(example):
+        return example['language'] == language
+
+    # Apply filter to each split
+    ds = ds.filter(filter_by_language)
+    # ds = ds.filter(filter_by_language, split='train')
+    # ds = ds.filter(filter_by_language, split='test')
+    # ds = ds.filter(filter_by_language, split='validation')
+
+    return ds
+
 
 def load_and_split_ds(path, name, test_size=0.2):
     ds = datasets.load_dataset(path, name)
@@ -178,10 +193,10 @@ def create_spacy_files(data_source, language):
 
 # Load Datasets
 
-bg_ds = datasets.load_dataset('joelniklaus/mapa', 'bg')
-cs_ds = datasets.load_dataset('joelniklaus/mapa', 'cs')
-sk_ds = datasets.load_dataset('joelniklaus/mapa', 'sk')
-sv_ds = datasets.load_dataset('joelniklaus/mapa', 'sv')
+bg_ds = load_ds('joelniklaus/mapa', 'default', 'bg')
+cs_ds = load_ds('joelniklaus/mapa', 'default', 'cs')
+sk_ds = load_ds('joelniklaus/mapa', 'default', 'sk')
+sv_ds = load_ds('joelniklaus/mapa', 'default', 'sv')
 
 # SpaCy Transformers off the Shelf Model
 
