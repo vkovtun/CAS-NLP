@@ -104,63 +104,6 @@ def get_lines_set(file_path):
                 lines_set.add(line)
     return lines_set
 
-PER_WIKIDATA_ENTITIES = get_lines_set('PER-ND.txt') | get_lines_set('PER-FI.txt')
-LOC_WIKIDATA_ENTITIES = get_lines_set('LOC-ND.txt')
-ORG_WIKIDATA_ENTITIES = get_lines_set('ORG-ND.txt')
-
-
-def get_entity_by_qid(qid):
-    """
-    Returns the entity by WikiData QID.
-
-    :return: Entity corresponding to the QID.
-    """
-    if not qid:
-        return 'MISC'
-    elif qid in LOC_WIKIDATA_ENTITIES:
-        return 'LOC'
-    elif qid in PER_WIKIDATA_ENTITIES:
-        return 'PER'
-    elif qid in ORG_WIKIDATA_ENTITIES:
-        return 'ORG'
-    else:
-        return 'MISC'
-
-
-def convert_row_wikianc(row):
-    entities = []
-    for anchor in row['paragraph_anchors']:
-        start_raw = anchor.get('start')
-        end_raw = anchor.get('end')
-        qid = anchor.get('qid')
-        label = get_entity_by_qid(str(qid))
-
-        # skip if any are None
-        if start_raw is None or end_raw is None or label is None:
-            continue
-
-        # ensure these are actually integers
-        try:
-            start = int(start_raw)
-            end = int(end_raw)
-        except ValueError:
-            # if you can't convert them to int, skip
-            print(f"start_raw={start_raw}, type(start_raw)={type(start_raw)}")
-            print(f"start_raw={end_raw}, type(start_raw)={type(end_raw)}")
-            continue
-
-        entities.append({
-            "start": start,
-            "end": end,
-            "label": label,
-        })
-
-    data_point = {
-        "text": row["paragraph_text"],
-        "entities": entities,
-    }
-    return data_point
-
 
 def create_spacy_doc_bin_files(dataset, output_dir, file_name, language, chunk_size=5000):
     os.makedirs(output_dir, exist_ok=True)  # Ensure output directory exists
@@ -223,13 +166,13 @@ def create_spacy_doc_bin_files(dataset, output_dir, file_name, language, chunk_s
 
 
 def create_spacy_files(data_source, language):
-    train_ner = data_source['train'].shuffle().select(range(min(3200000, len(data_source['train'])))).map(convert_row_wikianc)
+    train_ner = data_source['train'].shuffle().select(range(min(3200000, len(data_source['train']))))
     create_spacy_doc_bin_files(dataset=train_ner, file_name='train', output_dir=f'./{language}/train', language='xx')
 
-    dev_ner = data_source['test'].shuffle().select(range(min(960000, len(data_source['test'])))).map(convert_row_wikianc)
+    dev_ner = data_source['test'].shuffle().select(range(min(960000, len(data_source['test']))))
     create_spacy_doc_bin_files(dataset=dev_ner, file_name='dev', output_dir=f'./{language}/dev', language='xx')
 
-    valid_ner = data_source['validation'].shuffle().select(range(480000, len(data_source['validation']))).map(convert_row_wikianc)
+    valid_ner = data_source['validation'].shuffle().select(range(480000, len(data_source['validation'])))
     create_spacy_doc_bin_files(dataset=valid_ner, file_name='validation', output_dir=f'./{language}/validation', language='xx')
 
 
