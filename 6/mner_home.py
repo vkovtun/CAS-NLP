@@ -10,5 +10,5 @@ if 'model' not in st.session_state:
     model = spacy.load(Path('model_wikianc_uk_2/model-best'))
     st.session_state['model'] = model
 
-st.markdown("# POS tagger app")
+st.markdown("# NER tagger app")
 st.markdown("This is a names entity recognition app for English, Czech, Hungarian and Ukrainian.")
