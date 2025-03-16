@@ -1,24 +1,21 @@
 import streamlit as st
-import dill
-import nltk
-from nltk.tokenize import word_tokenize
+import spacy
+from spacy import displacy
+from pathlib import Path
+from spacy_streamlit import visualize_ner
 
 st.set_page_config(
     page_title="Short text POS",
 )
 
-nltk.download('punkt')
-
-with open("hmm_tagger.pkl", 'rb') as f:
-    loaded_tagger = dill.load(f)
-
+if 'model' not in st.session_state:
+    model = spacy.load(Path('model_wikianc_uk_2/model-best'))
+    st.session_state['model'] = model
 
 text = st.text_input("Insert a text to get the POS tags for it")
 
 if text:
-    tokens = word_tokenize(text)
-    tagged_sentence = loaded_tagger.tag(tokens)
-    html_results = ""
-    for word, tag in tagged_sentence:
-        html_results += f"<span style='color:red;'>{word} </span><span style='color:blue;'>{tag}</span> "
-    st.markdown(html_results, unsafe_allow_html=True)
+    model = st.session_state['model']
+    html_results = displacy.render(model(text), style="dep", minify=True, page=True)
+
+    visualize_ner(model(text), labels=model.get_pipe("ner").labels)

@@ -1,3 +1,7 @@
-nltk==3.8.1
-dill
 streamlit
+torch
+torchvision
+torchaudio
+spacy
+spacy-transformers
+spacy-streamlit
