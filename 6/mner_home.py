@@ -3,6 +3,7 @@ import spacy
 import os
 import zipfile
 import gdown
+import traceback
 from pathlib import Path
 
 FILE_ID="1mleDunOQr-pvRfPq7Q5pzjlz3Kc0eX2y"
@@ -10,29 +11,34 @@ DEST_ZIP = "model_wikianc_uk_2.zip"
 DEST_DIR = "model_wikianc_uk_2"
 
 def download_and_extract():
-    if os.path.isdir(DEST_DIR):
-        print(f"'{DEST_DIR}' already exists. Skipping download.")
-        return
+    try:
+        if os.path.isdir(DEST_DIR):
+            print(f"'{DEST_DIR}' already exists. Skipping download.")
+            return
 
-    # Construct the URL
-    url = f"https://drive.google.com/uc?id={FILE_ID}"
-    print("Downloading ZIP file...")
-    gdown.download(url, DEST_ZIP, quiet=False)
+        # Construct the URL
+        url = f"https://drive.google.com/uc?id={FILE_ID}"
+        print("Downloading ZIP file...")
+        gdown.download(url, DEST_ZIP, quiet=False)
 
-    print("Checking contents of current working directory:")
-    print(os.listdir())
+        print("Checking contents of current working directory:")
+        print(os.listdir())
 
-    print("Unzipping...")
-    with zipfile.ZipFile(DEST_ZIP, 'r') as zip_ref:
-        zip_ref.extractall(DEST_DIR)
+        print("Unzipping...")
+        with zipfile.ZipFile(DEST_ZIP, 'r') as zip_ref:
+            zip_ref.extractall(DEST_DIR)
 
-    print("Contents of model directory:")
-    print(os.listdir(DEST_DIR))
+        print("Contents of model directory:")
+        print(os.listdir(DEST_DIR))
 
-    print("Cleaning up...")
-    os.remove(DEST_ZIP)
+        print("Cleaning up...")
+        os.remove(DEST_ZIP)
 
-    print(f"Done! Files are in '{DEST_DIR}'.")
+        print(f"Done! Files are in '{DEST_DIR}'.")
+
+    except Exception as e:
+        print("❌ Error during download or extraction!")
+        traceback.print_exc()
 
 download_and_extract()
 
