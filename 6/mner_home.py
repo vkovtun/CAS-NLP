@@ -19,9 +19,15 @@ def download_and_extract():
     print("Downloading ZIP file...")
     gdown.download(url, DEST_ZIP, quiet=False)
 
+    print("Checking contents of current working directory:")
+    print(os.listdir())
+
     print("Unzipping...")
     with zipfile.ZipFile(DEST_ZIP, 'r') as zip_ref:
         zip_ref.extractall(DEST_DIR)
+
+    print("Contents of model directory:")
+    print(os.listdir(DEST_DIR))
 
     print("Cleaning up...")
     os.remove(DEST_ZIP)
