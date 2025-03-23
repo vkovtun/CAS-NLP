@@ -44,6 +44,11 @@ def download_and_extract():
     print(f"Done! Files are in '{DEST_DIR}'.")
 
 
+@st.cache
+def load_model():
+    return spacy.load(Path('model_wikianc_uk_2/model-best'))
+
+
 if not os.path.isdir(DEST_DIR):
     print(f"Path '{DEST_DIR}' does not exist. Triggering download...")
     download_and_extract()
@@ -51,7 +56,7 @@ else:
     print(f"'{DEST_DIR}' already exists. Skipping download.")
 
 if 'model' not in st.session_state:
-    model = spacy.load(Path('model_wikianc_uk_2/model-best'))
+    model = load_model()
     st.session_state['model'] = model
 
 st.markdown("# NER tagger app")
