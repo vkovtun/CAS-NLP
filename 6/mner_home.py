@@ -1,46 +1,56 @@
-import streamlit as st
-import spacy
 import os
 import zipfile
-import gdown
-import traceback
 from pathlib import Path
 
-FILE_ID="1mleDunOQr-pvRfPq7Q5pzjlz3Kc0eX2y"
+import gdown
+import spacy
+import streamlit as st
+
 DEST_ZIP = "model_wikianc_uk_2.zip"
-DEST_DIR = "model_wikianc_uk_2"
+DEST_DIR = "model_wikianc_uk_2/"
+TRANSFORMER_DIR = f"{DEST_DIR}/model-best/transformer/"
+
+def download(file_id, output):
+    url = f"https://drive.google.com/uc?id={file_id}"
+
+    print("Downloading ZIP file...")
+    gdown.download(url, output, quiet=False)
+
+    print("Checking contents of current working directory:")
+    print(os.listdir())
+
+def unzip(file, output):
+    with zipfile.ZipFile(file, 'r') as zip_ref:
+        zip_ref.extractall(output)
+
 
 def download_and_extract():
-    try:
-        if os.path.isdir(DEST_DIR):
-            print(f"'{DEST_DIR}' already exists. Skipping download.")
-            return
+    zip_file_id = os.environ['ZIP_FILE_ID']
+    model_file_id = os.environ['MODEL_FILE_ID']
 
-        # Construct the URL
-        url = f"https://drive.google.com/uc?id={FILE_ID}"
-        print("Downloading ZIP file...")
-        gdown.download(url, DEST_ZIP, quiet=False)
+    print("Downloading ZIP file...")
+    download(zip_file_id, DEST_ZIP)
 
-        print("Checking contents of current working directory:")
-        print(os.listdir())
+    print("Unzipping...")
+    unzip(DEST_ZIP, DEST_DIR)
 
-        print("Unzipping...")
-        with zipfile.ZipFile(DEST_ZIP, 'r') as zip_ref:
-            zip_ref.extractall(DEST_DIR)
+    print("Downloading model file...")
+    download(model_file_id, TRANSFORMER_DIR)
 
-        print("Contents of model directory:")
-        print(os.listdir(DEST_DIR))
+    print("Contents of model directory:")
+    print(os.listdir(DEST_DIR))
 
-        print("Cleaning up...")
-        os.remove(DEST_ZIP)
+    print("Cleaning up...")
+    os.remove(DEST_ZIP)
 
-        print(f"Done! Files are in '{DEST_DIR}'.")
+    print(f"Done! Files are in '{DEST_DIR}'.")
 
-    except Exception as e:
-        print("❌ Error during download or extraction!")
-        traceback.print_exc()
 
-download_and_extract()
+if not os.path.isdir(DEST_DIR):
+    print(f"Path '{DEST_DIR}' does not exist. Triggering download...")
+    download_and_extract()
+else:
+    print(f"'{DEST_DIR}' already exists. Skipping download.")
 
 if 'model' not in st.session_state:
     model = spacy.load(Path('model_wikianc_uk_2/model-best'))
