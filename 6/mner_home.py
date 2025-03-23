@@ -1,6 +1,7 @@
 import os
 import zipfile
 from pathlib import Path
+from huggingface_hub import snapshot_download
 
 import gdown
 import spacy
@@ -61,27 +62,34 @@ def download_and_extract():
     print(f"Done! Files are in '{DEST_DIR}'.")
 
 
+# @st.cache_resource
+# def load_model():
+#     try:
+#         print("Attempting to load SpaCy model...", flush=True)
+#         model = spacy.load(Path('model_wikianc_uk_2/model-best'))
+#         print("SpaCy model loaded!", flush=True)
+#         return model
+#     except Exception as e:
+#         print("Failed to load SpaCy model:", e, flush=True)
+#         raise
+
 @st.cache_resource
 def load_model():
-    try:
-        print("Attempting to load SpaCy model...", flush=True)
-        model = spacy.load(Path('model_wikianc_uk_2/model-best'))
-        print("SpaCy model loaded!", flush=True)
-        return model
-    except Exception as e:
-        print("Failed to load SpaCy model:", e, flush=True)
-        raise
+    model_path = snapshot_download(repo_id="spacy/xx_ent_wiki_sm", revision="main")
+    # Load the local model folder with spaCy
+    nlp = spacy.load(model_path)
+    return nlp
 
 
-if not os.path.isdir(DEST_DIR):
-    print(f"Path '{DEST_DIR}' does not exist. Triggering download...")
-    download_and_extract()
-else:
-    print(f"'{DEST_DIR}' already exists. Skipping download.")
+# if not os.path.isdir(DEST_DIR):
+#     print(f"Path '{DEST_DIR}' does not exist. Triggering download...")
+#     download_and_extract()
+# else:
+#     print(f"'{DEST_DIR}' already exists. Skipping download.")
 
 if 'model' not in st.session_state:
     model = load_model()
     st.session_state['model'] = model
 
 st.markdown("# NER tagger app")
-st.markdown("This is a names entity recognition app for English, Czech, Hungarian and Ukrainian.")
+st.markdown("This is a names entity recognition app for Multiple languages from SpaCy.")
