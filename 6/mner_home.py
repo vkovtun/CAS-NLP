@@ -13,11 +13,16 @@ MODEL_FILE = f"{TRANSFORMER_DIR}/model"
 
 
 def download(file_id, output):
-    url = f"https://drive.google.com/uc?id={file_id}"
-    gdown.download(url, output, quiet=False)
-
-    print("Checking contents of current working directory:")
-    print(os.listdir())
+    try:
+        print("Attempting download...")
+        url = f"https://drive.google.com/uc?id={file_id}"
+        gdown.download(url, output, quiet=False)
+        print("Download finished. Checking contents...")
+        print(os.listdir())
+    except Exception as e:
+        print("Download failed with exception:")
+        import traceback
+        traceback.print_exc()
 
 
 def unzip(file, output):
