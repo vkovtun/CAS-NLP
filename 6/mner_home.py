@@ -14,13 +14,13 @@ MODEL_FILE = f"{TRANSFORMER_DIR}/model"
 
 def download(file_id, output):
     try:
-        print("Attempting download...")
+        print("Attempting download...", flush=True)
         url = f"https://drive.google.com/uc?id={file_id}"
         gdown.download(url, output, quiet=False)
-        print("Download finished. Checking contents...")
-        print(os.listdir())
+        print("Download finished. Checking contents...", flush=True)
+        print(os.listdir(), flush=True)
     except Exception as e:
-        print("Download failed with exception:")
+        print("Download failed with exception:", flush=True)
         import traceback
         traceback.print_exc()
 
@@ -64,12 +64,12 @@ def download_and_extract():
 @st.cache_resource
 def load_model():
     try:
-        print("Attempting to load SpaCy model...")
+        print("Attempting to load SpaCy model...", flush=True)
         model = spacy.load(Path('model_wikianc_uk_2/model-best'))
-        print("SpaCy model loaded!")
+        print("SpaCy model loaded!", flush=True)
         return model
     except Exception as e:
-        print("Failed to load SpaCy model:", e)
+        print("Failed to load SpaCy model:", e, flush=True)
         raise
 
 
