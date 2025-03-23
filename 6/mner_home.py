@@ -12,8 +12,6 @@ TRANSFORMER_DIR = f"{DEST_DIR}/model-best/transformer/"
 
 def download(file_id, output):
     url = f"https://drive.google.com/uc?id={file_id}"
-
-    print("Downloading ZIP file...")
     gdown.download(url, output, quiet=False)
 
     print("Checking contents of current working directory:")
