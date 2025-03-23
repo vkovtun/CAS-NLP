@@ -9,6 +9,8 @@ import streamlit as st
 DEST_ZIP = "model_wikianc_uk_2.zip"
 DEST_DIR = "model_wikianc_uk_2/"
 TRANSFORMER_DIR = f"{DEST_DIR}/model-best/transformer/"
+MODEL_FILE = f"{TRANSFORMER_DIR}/model"
+
 
 def download(file_id, output):
     url = f"https://drive.google.com/uc?id={file_id}"
@@ -16,6 +18,7 @@ def download(file_id, output):
 
     print("Checking contents of current working directory:")
     print(os.listdir())
+
 
 def unzip(file, output):
     with zipfile.ZipFile(file, 'r') as zip_ref:
@@ -32,8 +35,17 @@ def download_and_extract():
     print("Unzipping...")
     unzip(DEST_ZIP, DEST_DIR)
 
+    print("Contents of DEST_DIR:")
+    print(os.listdir(DEST_DIR))
+
+    print("Contents of model-best:")
+    print(os.listdir(f"{DEST_DIR}/model-best"))
+
+    print("Contents of transformer:")
+    print(os.listdir(f"{DEST_DIR}/model-best/transformer"))
+
     print("Downloading model file...")
-    download(model_file_id, TRANSFORMER_DIR)
+    download(model_file_id, MODEL_FILE)
 
     print("Contents of model directory:")
     print(os.listdir(DEST_DIR))
@@ -44,9 +56,16 @@ def download_and_extract():
     print(f"Done! Files are in '{DEST_DIR}'.")
 
 
-@st.cache
+@st.cache_resource
 def load_model():
-    return spacy.load(Path('model_wikianc_uk_2/model-best'))
+    try:
+        print("Attempting to load SpaCy model...")
+        model = spacy.load(Path('model_wikianc_uk_2/model-best'))
+        print("SpaCy model loaded!")
+        return model
+    except Exception as e:
+        print("Failed to load SpaCy model:", e)
+        raise
 
 
 if not os.path.isdir(DEST_DIR):
