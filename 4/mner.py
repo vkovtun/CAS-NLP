@@ -1,9 +1,9 @@
-import csv
 import os
 
 import datasets
 import spacy
 from datasets import DatasetDict
+from pathlib import Path
 from spacy.tokens import DocBin
 from tqdm import tqdm
 
@@ -103,9 +103,9 @@ def get_lines_set(file_path):
                 lines_set.add(line)
     return lines_set
 
-PER_WIKIDATA_ENTITIES = get_lines_set('PER-ND.txt') | get_lines_set('PER-FI.txt')
-LOC_WIKIDATA_ENTITIES = get_lines_set('LOC-ND.txt')
-ORG_WIKIDATA_ENTITIES = get_lines_set('ORG-ND.txt')
+# PER_WIKIDATA_ENTITIES = get_lines_set('PER-ND.txt') | get_lines_set('PER-FI.txt')
+# LOC_WIKIDATA_ENTITIES = get_lines_set('LOC-ND.txt')
+# ORG_WIKIDATA_ENTITIES = get_lines_set('ORG-ND.txt')
 
 
 def get_entity_by_qid(qid):
@@ -234,11 +234,10 @@ def create_spacy_files(data_source, language):
 
 # Load Datasets¶
 
-
-en_ds = load_and_split_ds('cyanic-selkie/wikianc', 'en')
-cs_ds = load_and_split_ds('cyanic-selkie/wikianc', 'cs')
-hu_ds = load_and_split_ds('cyanic-selkie/wikianc', 'hu')
-uk_ds = load_and_split_ds('cyanic-selkie/wikianc', 'uk')
+# en_ds = load_and_split_ds('cyanic-selkie/wikianc', 'en')
+# cs_ds = load_and_split_ds('cyanic-selkie/wikianc', 'cs')
+# hu_ds = load_and_split_ds('cyanic-selkie/wikianc', 'hu')
+# uk_ds = load_and_split_ds('cyanic-selkie/wikianc', 'uk')
 
 # SpaCy Transformers off the Shelf Model
 
@@ -311,18 +310,18 @@ visualize_entities(hu_text, model)
 
 # Training Model
 
-## Document Files Initialization
-
-create_spacy_files(en_ds,'en')
-create_spacy_files(cs_ds,'cs')
-create_spacy_files(hu_ds,'hu')
-# create_spacy_files(uk_ds,'uk')
+# ## Document Files Initialization
+#
+# create_spacy_files(en_ds,'en')
+# create_spacy_files(cs_ds,'cs')
+# create_spacy_files(hu_ds,'hu')
+# # create_spacy_files(uk_ds,'uk')
 
 # Run  python -m spacy train config_mapa_en_1.cfg --output model_mapa_en_1 --gpu-id 0
 
 
-# # model_trained = spacy.load(Path('model_mapa_en_1/model-best'))
-# model_trained = spacy.load(Path('model_wikianc_en_1_ubelix/model-best'))
-# print(model_trained.pipe_names)
-#
-# visualize_entities(en_text, model_trained)
+# model_trained = spacy.load(Path('model_mapa_en_1/model-best'))
+model_trained = spacy.load(Path('model_wikianc_en_xx_1/model-best'))
+print(model_trained.pipe_names)
+
+visualize_entities(en_text, model_trained)
