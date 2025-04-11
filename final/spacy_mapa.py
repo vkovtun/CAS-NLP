@@ -96,11 +96,8 @@ visualize_entities(cs_text, model)
 # visualize_entities(sv_text, model)
 
 # Install the following
-# pip install -U pip setuptools wheel
-# pip install -U 'spacy[cuda12x]'
+# pip install -U pip setuptools wheel spacy[cuda12x] spacy-transformers thinc[torch]
 # python -m spacy download xx_ent_wiki_sm
-# pip install thinc[torch]
-# pip install spacy-transformers
 # Run python -m spacy train config_mapa_<language>.cfg --output model_mapa_<language> --gpu-id 0
 
 model_trained = spacy.load(Path('model_mapa_cs/model-best'))
