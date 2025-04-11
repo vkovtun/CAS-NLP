@@ -151,8 +151,12 @@ def create_spacy_files(data_source, language, tag_map):
     dev_ner = data_source['test'].shuffle().select(range(min(960000, len(data_source['test']))))
     create_spacy_doc_bin_files(dataset=dev_ner, file_name='dev', output_dir=f'./{language}/dev', language='xx', tag_map=tag_map)
 
-    valid_ner = data_source['validation'].shuffle().select(range(480000, len(data_source['validation'])))
+    valid_ner = data_source['validation'].shuffle().select(range(min(480000, len(data_source['validation']))))
     create_spacy_doc_bin_files(dataset=valid_ner, file_name='validation', output_dir=f'./{language}/validation', language='xx', tag_map=tag_map)
+
+    print(f"len(train_ner)={len(train_ner)}")
+    print(f"len(dev_ner)={len(dev_ner)}")
+    print(f"len(valid_ner)={len(valid_ner)}")
 
 
 mapa_to_spacy_tag_map = {
