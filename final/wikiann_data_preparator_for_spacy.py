@@ -25,6 +25,9 @@ NO_SPACE_AFTER_SEQUENCE = ["'", "''"]
 
 DS_PATH = 'unimelb-nlp/wikiann'
 
+LANGUAGES =             ['be', 'bg', 'bs', 'cs', 'hr', 'mk', 'pl', 'ru', 'sh', 'sk', 'sl', 'sr', 'uk']
+SPACY_BLANK_LANGUAGES = ['xx', 'bg', 'bs', 'cs', 'hr', 'mk', 'pl', 'ru', 'sh', 'sk', 'sl', 'sr', 'uk']
+
 
 def tokens_to_spans(tokens, tags, language, tag_list):
     """
@@ -163,21 +166,41 @@ def create_spacy_files(data_source, language, nlp, tag_list):
 
 tags = ['O', 'B-PER', 'I-PER', 'B-ORG', 'I-ORG', 'B-LOC', 'I-LOC']
 
+# Slavic languages supported by 'unimelb-nlp/wikiann':
+# be – Belarusian (East Slavic)
+# bg – Bulgarian (South Slavic)
+# bs – Bosnian (South Slavic)
+# cs – Czech (West Slavic)
+# hr – Croatian (South Slavic)
+# mk – Macedonian (South Slavic)
+# pl – Polish (West Slavic)
+# ru – Russian (East Slavic)
+# sh – Serbo-Croatian (South Slavic; sometimes used as a common code for Bosnian, Croatian, Serbian, etc.)
+# sk – Slovak (West Slavic)
+# sl – Slovenian (South Slavic)
+# sr – Serbian (South Slavic)
+# uk – Ukrainian (East Slavic)
+#
+# These are the number of data fields each language is trained at.
+# ┌────────────┬─────────┬────────────┬───────┐
+# │ Language   │ Train   │ Validation │ Test  │
+# ├────────────┼─────────┼────────────┼───────┤
+# │ be         │ 15000   │ 1000       │ 1000  │
+# │ bg         │ 20000   │ 10000      │ 10000 │
+# │ bs         │ 15000   │ 1000       │ 1000  │
+# │ cs         │ 20000   │ 10000      │ 10000 │
+# │ hr         │ 20000   │ 10000      │ 10000 │
+# │ mk         │ 10000   │ 1000       │ 1000  │
+# │ pl         │ 20000   │ 10000      │ 10000 │
+# │ ru         │ 20000   │ 10000      │ 10000 │
+# │ sh         │ 20000   │ 10000      │ 10000 │
+# │ sk         │ 20000   │ 10000      │ 10000 │
+# │ sl         │ 15000   │ 10000      │ 10000 │
+# │ sr         │ 20000   │ 10000      │ 10000 │
+# │ uk         │ 20000   │ 10000      │ 10000 │
+# └────────────┴─────────┴────────────┴───────┘
 
-# Load Datasets
-
-# bg_ds = load_ds(DS_PATH, 'default', 'bg')
-# cs_ds = load_ds(DS_PATH, 'default', 'cs')
-# sk_ds = load_ds(DS_PATH, 'default', 'sk')
-# sv_ds = load_ds(DS_PATH, 'default', 'sv')
-
-cs_ds = datasets.load_dataset(DS_PATH, 'cs')
-
-# Training Model
-
-## Document Files Initialization
-
-# create_spacy_files(bg_ds,'bg')
-create_spacy_files(cs_ds,'cs', spacy.blank('cs'), tags)
-# create_spacy_files(sk_ds,'sk')
-# create_spacy_files(sv_ds,'sv')
+for i, language in enumerate(LANGUAGES):
+    print(f"Processing language: {language}")
+    ds = datasets.load_dataset(DS_PATH, language)
+    create_spacy_files(ds, language, spacy.blank(SPACY_BLANK_LANGUAGES[i]), tags)
