@@ -152,13 +152,13 @@ def create_spacy_doc_bin_files(dataset, output_dir, file_name, nlp, tag_list, ch
 
 def create_spacy_files(data_source, language, nlp, tag_list):
     train_ner = data_source['train'].shuffle().select(range(min(3200000, len(data_source['train']))))
-    create_spacy_doc_bin_files(dataset=train_ner, file_name='train', output_dir=f'./{language}/train', nlp=nlp, tag_list=tag_list)
+    create_spacy_doc_bin_files(dataset=train_ner, file_name='train', output_dir=f'./datasets/wikiann/{language}/train', nlp=nlp, tag_list=tag_list)
 
     dev_ner = data_source['test'].shuffle().select(range(min(960000, len(data_source['test']))))
-    create_spacy_doc_bin_files(dataset=dev_ner, file_name='dev', output_dir=f'./{language}/dev', nlp=nlp, tag_list=tag_list)
+    create_spacy_doc_bin_files(dataset=dev_ner, file_name='dev', output_dir=f'./datasets/wikiann/{language}/dev', nlp=nlp, tag_list=tag_list)
 
     valid_ner = data_source['validation'].shuffle().select(range(min(480000, len(data_source['validation']))))
-    create_spacy_doc_bin_files(dataset=valid_ner, file_name='validation', output_dir=f'./{language}/validation', nlp=nlp, tag_list=tag_list)
+    create_spacy_doc_bin_files(dataset=valid_ner, file_name='validation', output_dir=f'./datasets/wikiann/{language}/validation', nlp=nlp, tag_list=tag_list)
 
     print(f"len(train_ner)={len(train_ner)}")
     print(f"len(dev_ner)={len(dev_ner)}")
