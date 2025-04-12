@@ -6,6 +6,7 @@ from datasets import DatasetDict
 from spacy.tokens import DocBin
 from tqdm import tqdm
 
+DS_PATH = 'joelniklaus/mapa'
 
 def tokens_to_text_with_tags(tokens, tags, tag_map):
     """
@@ -26,8 +27,13 @@ def tokens_to_text_with_tags(tokens, tags, tag_map):
     current_entity = None
 
     for token, tag in zip(tokens, tags):
-        if token in {',', '.', '!', '?', ';', ':', '"', "'s"}:
+        if token in {
+            ',', '.', '!', '?', ';', ':', '"', "'", "''", '[', ']', '(', ')', '{', '}',
+            '“', '”', '‘', '’', '–', '-', '—', '/', '\\', '|', '<', '>', '<<', '>>', '#', '*', '&', '%', '$', '@', '`', '~',
+            '‹', '›', '«', '»'
+        }:
             sentence += token  # Attach punctuation directly
+            current_pos += len(token)
         else:
             if sentence and not sentence.endswith(' '):
                 sentence += ' '
@@ -168,20 +174,27 @@ mapa_to_spacy_tag_map = {
     'AMOUNT': 'MISC',
     'O': 'O'
 }
-    
+
+identity_map = {
+    'LOC': 'LOC',
+    'ORG': 'ORG',
+    'PER': 'PER',
+    'O': 'O'
+}
+
 
 # Load Datasets
 
-# bg_ds = load_ds('joelniklaus/mapa', 'default', 'bg')
-cs_ds = load_ds('joelniklaus/mapa', 'default', 'cs')
-# sk_ds = load_ds('joelniklaus/mapa', 'default', 'sk')
-# sv_ds = load_ds('joelniklaus/mapa', 'default', 'sv')
+# bg_ds = load_ds(DS_PATH, 'default', 'bg')
+cs_ds = load_ds(DS_PATH, 'default', 'cs')
+# sk_ds = load_ds(DS_PATH, 'default', 'sk')
+# sv_ds = load_ds(DS_PATH, 'default', 'sv')
 
 # Training Model
 
 ## Document Files Initialization
 
 # create_spacy_files(bg_ds,'bg')
-create_spacy_files(cs_ds,'cs', mapa_to_spacy_tag_map)
+create_spacy_files(cs_ds,'cs', identity_map)
 # create_spacy_files(sk_ds,'sk')
 # create_spacy_files(sv_ds,'sv')
