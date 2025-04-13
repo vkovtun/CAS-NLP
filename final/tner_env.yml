@@ -5,10 +5,10 @@ channels:
 dependencies:
   - python=3.9
   - pip
-  - pandas==1.3.5
   - setuptools=59.5.0
   - wheel
   - numpy=1.21.6
+  - pandas=1.3.5
   - cython
   - spacy=3.2.4
   - thinc=8.0.15
@@ -27,6 +27,9 @@ dependencies:
   - flask
   - pyarrow<=12.0.1
   - pip:
+      - pydantic==1.7.4
+      - allennlp==2.9.3
+      - tner==0.2.4
       - cached_path==1.1.6
       - base58
       - fairscale==0.4.6
@@ -40,10 +43,5 @@ dependencies:
       - sentencepiece
       - termcolor==1.1.0
       - wandb<0.13.0
-      - pydantic==1.7.4
       - seqeval
-#      - "numpy<2"
-#      - "allennlp==2.9.3"
-#      - "tner==0.2.4"
-#      - allennlp==2.9.3
-#      - tner==0.2.4
+      - "numpy<1.22"  # locked again for safety
