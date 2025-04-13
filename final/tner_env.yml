@@ -26,7 +26,22 @@ dependencies:
   - tensorboardX
   - flask
   - pyarrow<=12.0.1
-#  - pip:
+  - pip:
+      - cached_path==1.1.6
+      - base58
+      - fairscale==0.4.6
+      - h5py
+      - lmdb
+      - more-itertools
+      - nltk
+      - pytest
+      - scikit-learn
+      - scipy
+      - sentencepiece
+      - termcolor==1.1.0
+      - wandb<0.13.0
+      - pydantic==1.7.4
+      - seqeval
 #      - "numpy<2"
 #      - "allennlp==2.9.3"
 #      - "tner==0.2.4"
