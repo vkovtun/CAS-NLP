@@ -28,6 +28,8 @@ DS_PATH = 'unimelb-nlp/wikiann'
 LANGUAGES =             ['be', 'bg', 'bs', 'cs', 'hr', 'mk', 'pl', 'ru', 'sh', 'sk', 'sl', 'sr', 'uk']
 SPACY_BLANK_LANGUAGES = ['xx', 'bg', 'bs', 'cs', 'hr', 'mk', 'pl', 'ru', 'sh', 'sk', 'sl', 'sr', 'uk']
 
+# python -m spacy train config_wikiann_bs.cfg --output models/wikiann/bs --gpu-id 0 && python -m spacy train config_wikiann_cs.cfg --output models/wikiann/cs --gpu-id 0 && python -m spacy train config_wikiann_hr.cfg --output models/wikiann/hr --gpu-id 0 && python -m spacy train config_wikiann_mk.cfg --output models/wikiann/mk --gpu-id 0 && python -m spacy train config_wikiann_pl.cfg --output models/wikiann/pl --gpu-id 0
+
 
 def tokens_to_spans(tokens, tags, language, tag_list):
     """
