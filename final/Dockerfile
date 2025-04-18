@@ -1,7 +1,7 @@
 # Dockerfile for tner==0.2.4 with GPU (CUDA 11.3 + PyTorch 1.12.1)
 # Compatible with NVIDIA RTX GPUs, validated with CUDA 12.2 drivers
 
-FROM nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu20.04
+FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
 
 # Avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
@@ -15,10 +15,6 @@ RUN apt-get update && \
 
 # Create a working directory
 WORKDIR /workspace
-
-# Install PyTorch 1.12.1 with CUDA 11.3 directly from PyTorch
-RUN pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 \
-    --extra-index-url https://download.pytorch.org/whl/cu113
 
 # Install tner and other dependencies
 RUN pip install \
