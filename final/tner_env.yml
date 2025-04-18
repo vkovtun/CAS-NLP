@@ -1,5 +1,7 @@
-name: tner
+name: tner_test
 channels:
+  - nvidia
+  - pytorch
   - conda-forge
   - defaults
 dependencies:
@@ -17,8 +19,10 @@ dependencies:
   - cymem
   - murmurhash
   - plac
-  - pytorch=1.10
-  - torchvision
+#  - pytorch=2.5
+#  - pytorch-cuda=12.1
+  - pytorch=2.1          # updated for CUDA 12.1 compatibility
+  - pytorch-cuda=12.1    # this enables GPU usage
   - transformers=4.17.0
   - tokenizers=0.11.6
   - datasets=2.10.1
