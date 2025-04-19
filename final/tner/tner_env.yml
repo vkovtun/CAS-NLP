@@ -19,10 +19,9 @@ dependencies:
   - cymem
   - murmurhash
   - plac
-#  - pytorch=2.5
-#  - pytorch-cuda=12.1
-  - pytorch=2.1          # updated for CUDA 12.1 compatibility
-  - pytorch-cuda=12.1    # this enables GPU usage
+  - pytorch=2.1.2
+  - pytorch-cuda=12.1
+  - torchvision
   - transformers=4.17.0
   - tokenizers=0.11.6
   - datasets=2.10.1
@@ -32,7 +31,7 @@ dependencies:
   - pyarrow<=12.0.1
   - pip:
       - pydantic==1.7.4
-      - allennlp==2.9.3
+#      - allennlp==2.9.3
       - tner==0.2.4
       - cached_path==1.1.6
       - base58
@@ -48,4 +47,4 @@ dependencies:
       - termcolor==1.1.0
       - wandb<0.13.0
       - seqeval
-      - "numpy<1.22"  # locked again for safety
+      - "numpy<1.22"
