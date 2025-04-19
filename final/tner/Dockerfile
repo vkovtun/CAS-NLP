@@ -35,13 +35,14 @@ ENV PATH="/opt/anaconda/bin:$PATH"
 # Instrcutions are from here: https://github.com/pytorch/pytorch#from-source
 
 RUN conda create -y -n pytorch-env python=3.9 && \
+    conda init && \
     conda activate pytorch-env && \
     git clone --recursive --branch v1.12.1 https://github.com/pytorch/pytorch.git && \
     cd pytorch && \
     conda install -y cmake ninja numpy pyyaml mkl mkl-include setuptools cffi typing_extensions future six requests dataclasses && \
     pip install -r requirements.txt && \
     pip install mkl-static mkl-include && \
-    conda install -y -c pytorch magma-cuda113 && \
+    conda install -y magma-cuda113 -c pytorch && \
     export CMAKE_PREFIX_PATH="${CONDA_PREFIX}" && \
     export TORCH_CUDA_ARCH_LIST="8.6" && \
     python setup.py install && \
