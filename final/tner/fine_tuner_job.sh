@@ -49,11 +49,5 @@ echo "Total VRAM: ${total_vram_gb} GB"
 
 module load Anaconda3
 
-# Activate prepared Conda environment
-conda activate tner
-
 # Running the actual job
-python tner_fine_tuner_wikiann.py languages[$SLURM_ARRAY_TASK_ID]
-
-# Deactivating the virtual environment
-conda deactivate tner
+conda run -n tner python tner_fine_tuner_wikiann.py languages[$SLURM_ARRAY_TASK_ID]
