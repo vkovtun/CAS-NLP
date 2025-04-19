@@ -35,13 +35,15 @@ ENV PATH="/opt/anaconda/bin:$PATH"
 # Instrcutions are from here: https://github.com/pytorch/pytorch#from-source
 
 RUN conda create -y -n pytorch-env python=3.9 && \
-    conda install -n pytorch-env -y git cmake ninja numpy pyyaml mkl mkl-include setuptools cffi typing_extensions future six requests dataclasses && \
+    conda install -n pytorch-env -y git cmake ninja numpy=1.23 pyyaml mkl mkl-include setuptools cffi typing_extensions future six requests dataclasses && \
     git clone --recursive --branch v1.12.1 https://github.com/pytorch/pytorch.git && \
     cd pytorch && \
     conda run -n pytorch-env pip install -r requirements.txt && \
     conda run -n pytorch-env pip install mkl-static mkl-include && \
     conda install -n pytorch-env -y -c pytorch magma-cuda113 && \
-    conda run -n pytorch-env bash -c 'export CMAKE_PREFIX_PATH=$CONDA_PREFIX && export TORCH_CUDA_ARCH_LIST="8.6" && python setup.py install' && \
+    conda run -n pytorch-env bash -c 'export CMAKE_PREFIX_PATH=$(conda run -n pytorch-env python -c "import sys; print(sys.prefix)") && \
+        export TORCH_CUDA_ARCH_LIST="8.6" && \
+        python setup.py install' && \
     cd .. && rm -rf pytorch
 
 
@@ -59,7 +61,6 @@ RUN pip install \
 
 # Install scientific & NLP tools
 RUN pip install \
-    numpy==1.21.6 \
     pandas==1.3.5 \
     scikit-learn \
     scipy \
