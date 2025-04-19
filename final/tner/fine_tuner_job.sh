@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name="TNER Fine Tuning"
 #SBATCH --time=00:20:00
-#SBATCH --mem-per-cpu=1GB
+#SBATCH --mem-per-cpu=2GB
 #SBATCH --cpus-per-task=10
 #SBATCH --qos=job_cpu_debug
 #SBATCH --partition=epyc2
