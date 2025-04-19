@@ -49,5 +49,7 @@ echo "Total VRAM: ${total_vram_gb} GB"
 
 module load Anaconda3
 
+echo "'conda run' for language ${languages[$SLURM_ARRAY_TASK_ID]}"
+
 # Running the actual job
 conda run -n tner python tner_fine_tuner_wikiann.py ${languages[$SLURM_ARRAY_TASK_ID]}
