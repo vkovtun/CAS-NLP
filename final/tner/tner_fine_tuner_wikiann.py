@@ -12,7 +12,7 @@ searcher = GridSearcher(
         'test': f'datasets/wikiann/{language}/test.txt'
     },
     model='roberta-large',  # language model to fine-tune  
-    epoch=5,  # the total epoch (`L` in the figure)
+    epoch=3,  # the total epoch (`L` in the figure)
     epoch_partial=2,  # the number of epochs at 1st stage (`M` in the figure)
     n_max_config=3,  # the number of models to pass to 2nd stage (`K` in the figure)
     batch_size=16,
