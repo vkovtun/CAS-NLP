@@ -51,7 +51,7 @@ echo "Total VRAM: ${total_vram_gb} GB"
 conda activate tner
 
 # Running the actual job
-python tner_fine_tuner_wikiann.py
+python tner_fine_tuner_wikiann.py languages[$SLURM_ARRAY_TASK_ID]
 
 # Deactivating the virtual environment
 conda deactivate tner
