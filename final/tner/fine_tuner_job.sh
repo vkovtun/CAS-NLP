@@ -2,7 +2,7 @@
 #SBATCH --job-name="TNER Fine Tuning"
 #SBATCH --time=02:00:00
 #SBATCH --mem-per-cpu=2GB
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=30
 #SBATCH --qos=job_cpu
 #SBATCH --partition=epyc2
 #_SBATCH --gres=gpu:rtx3090:1
