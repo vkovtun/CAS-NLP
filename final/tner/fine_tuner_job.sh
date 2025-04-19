@@ -1,15 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name="TNER Fine Tuning"
-#SBATCH --time=00:20:00
+#SBATCH --time=02:00:00
 #SBATCH --mem-per-cpu=2GB
 #SBATCH --cpus-per-task=10
-#SBATCH --qos=job_cpu_debug
+#SBATCH --qos=job_cpu
 #SBATCH --partition=epyc2
 #_SBATCH --gres=gpu:rtx3090:1
 #_SBATCH --gres=gpu:rtx4090:1
 #_SBATCH --gres=gpu:a100:1
 #_SBATCH --gres=gpu:h100:4
-#SBATCH --array=0-0
+#SBATCH --array=0-3
 
 # Slavic languages we consider:
 # be – Belarusian (East Slavic)
