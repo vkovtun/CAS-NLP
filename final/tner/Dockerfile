@@ -1,9 +1,14 @@
 # Dockerfile for tner==0.2.4 with GPU (CUDA 11.3 + PyTorch 1.12.1)
 
-FROM nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu20.04
+FROM nvidia/cuda:11.3.1-cudnn8-devel-ubuntu20.04
 
 # Avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Fail early if CUDA is not enabled.
+ENV USE_CUDA=1
+
+ENV CONDA_ENV=pytorch-env
 
 # Bash shell is needed
 SHELL ["/bin/bash", "-c"]
@@ -24,9 +29,11 @@ RUN curl https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh -
     rm anaconda.sh && \
     ln -s /opt/anaconda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
     echo ". /opt/anaconda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate pytorch-env" >> ~/.bashrc
+    echo "conda activate $CONDA_ENV" >> ~/.bashrc
 
 ENV PATH="/opt/anaconda/bin:$PATH"
+
+RUN nvcc -V
 
 # Install PyTorch 1.12.1 with CUDA 11.3 directly from PyTorch
 #RUN pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 \
@@ -34,33 +41,39 @@ ENV PATH="/opt/anaconda/bin:$PATH"
 
 # Instrcutions are from here: https://github.com/pytorch/pytorch#from-source
 
-RUN conda create -y -n pytorch-env python=3.9 && \
-    conda install -n pytorch-env -y git cmake ninja numpy=1.23 pyyaml mkl mkl-include setuptools cffi typing_extensions future six requests dataclasses && \
-    git clone --recursive --branch v1.12.1 https://github.com/pytorch/pytorch.git && \
-    cd pytorch && \
-    conda run -n pytorch-env pip install -r requirements.txt && \
-    conda run -n pytorch-env pip install mkl-static mkl-include && \
-    conda install -n pytorch-env -y -c pytorch magma-cuda113 && \
-    conda run -n pytorch-env bash -c 'export CMAKE_PREFIX_PATH=$(conda run -n pytorch-env python -c "import sys; print(sys.prefix)") && \
-        export TORCH_CUDA_ARCH_LIST="8.6" && \
-        python setup.py install' && \
-    cd .. && rm -rf pytorch
+RUN conda create -y -n $CONDA_ENV python=3.9 && \
+    conda install -y -n $CONDA_ENV \
+        pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 \
+        cudatoolkit=11.3 -c pytorch -c nvidia && \
+    conda clean -ay
 
+#RUN conda create -y -n $CONDA_ENV python=3.9 && \
+#    conda install -n $CONDA_ENV -y git cmake ninja numpy=1.23 pyyaml mkl mkl-include setuptools cffi typing_extensions future six requests dataclasses && \
+#    git clone --recursive --branch v1.12.1 https://github.com/pytorch/pytorch.git && \
+#    cd pytorch && \
+#    conda run -n $CONDA_ENV pip install -r requirements.txt && \
+#    conda run -n $CONDA_ENV pip install mkl-static mkl-include && \
+#    conda install -n $CONDA_ENV -y -c pytorch magma-cuda113 && \
+#    conda run -n $CONDA_ENV bash -c 'export CMAKE_PREFIX_PATH=$(conda run -n pytorch-env python -c "import sys; print(sys.prefix)") && \
+#        export TORCH_CUDA_ARCH_LIST="8.6" && \
+#        python setup.py install' && \
+#    cd .. && rm -rf pytorch
+
+RUN conda run -n $CONDA_ENV pip install allennlp==2.10.1
+
+#RUN conda install -n $CONDA_ENV -y allennlp==2.10.0 -c conda-forge
 
 # Install tner and other dependencies
-RUN pip install \
+# Install scientific & NLP tools
+RUN conda run -n $CONDA_ENV pip install \
     tner==0.2.4 \
-    allennlp==2.9.3 \
     fairscale==0.4.6 \
-    "wandb<0.13.0" \
+    wandb \
     seqeval \
     sentencepiece \
     pydantic==1.7.4 \
     cached_path==1.1.6 \
-    termcolor==1.1.0
-
-# Install scientific & NLP tools
-RUN pip install \
+    termcolor==1.1.0 \
     pandas==1.3.5 \
     scikit-learn \
     scipy \
