@@ -47,6 +47,8 @@ fi
 echo "Total RAM: ${total_ram_gb} GB"
 echo "Total VRAM: ${total_vram_gb} GB"
 
+module load Anaconda3
+
 # Activate prepared Conda environment
 conda activate tner
 
