@@ -35,10 +35,6 @@ ENV PATH="/opt/anaconda/bin:$PATH"
 
 RUN nvcc -V
 
-# Install PyTorch 1.12.1 with CUDA 11.3 directly from PyTorch
-#RUN pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 \
-#    --extra-index-url https://download.pytorch.org/whl/cu113
-
 # Instrcutions are from here: https://github.com/pytorch/pytorch#from-source
 
 RUN conda create -y -n $CONDA_ENV python=3.9 && \
@@ -47,21 +43,9 @@ RUN conda create -y -n $CONDA_ENV python=3.9 && \
         cudatoolkit=11.3 -c pytorch -c nvidia && \
     conda clean -ay
 
-#RUN conda create -y -n $CONDA_ENV python=3.9 && \
-#    conda install -n $CONDA_ENV -y git cmake ninja numpy=1.23 pyyaml mkl mkl-include setuptools cffi typing_extensions future six requests dataclasses && \
-#    git clone --recursive --branch v1.12.1 https://github.com/pytorch/pytorch.git && \
-#    cd pytorch && \
-#    conda run -n $CONDA_ENV pip install -r requirements.txt && \
-#    conda run -n $CONDA_ENV pip install mkl-static mkl-include && \
-#    conda install -n $CONDA_ENV -y -c pytorch magma-cuda113 && \
-#    conda run -n $CONDA_ENV bash -c 'export CMAKE_PREFIX_PATH=$(conda run -n pytorch-env python -c "import sys; print(sys.prefix)") && \
-#        export TORCH_CUDA_ARCH_LIST="8.6" && \
-#        python setup.py install' && \
-#    cd .. && rm -rf pytorch
-
 RUN conda run -n $CONDA_ENV pip install allennlp==2.10.1
 
-#RUN conda install -n $CONDA_ENV -y allennlp==2.10.0 -c conda-forge
+RUN conda install -n $CONDA_ENV -y "numpy<2"
 
 # Install tner and other dependencies
 # Install scientific & NLP tools
