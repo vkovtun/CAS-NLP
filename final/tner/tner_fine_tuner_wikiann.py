@@ -8,7 +8,7 @@ searcher = GridSearcher(
     #     dataset="tner/wikiann",  # either of `dataset` (huggingface dataset) or `local_dataset` (custom dataset) should be given
     local_dataset={
         'train': f'datasets/wikiann/{language}/train.txt',
-        'valid': f'datasets/wikiann/{language}/dev.txt',
+        'validation': f'datasets/wikiann/{language}/dev.txt',
         'test': f'datasets/wikiann/{language}/test.txt'
     },
     model='roberta-large',  # language model to fine-tune  
