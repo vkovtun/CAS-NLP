@@ -41,15 +41,13 @@ RUN conda create -y -n $CONDA_ENV python=3.9 && \
     conda install -y -n $CONDA_ENV \
         pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 \
         cudatoolkit=11.3 -c pytorch -c nvidia && \
+    conda install -n $CONDA_ENV -y "numpy<2" && \
     conda clean -ay
-
-RUN conda run -n $CONDA_ENV pip install allennlp==2.10.1
-
-RUN conda install -n $CONDA_ENV -y "numpy<2"
 
 # Install tner and other dependencies
 # Install scientific & NLP tools
 RUN conda run -n $CONDA_ENV pip install \
+    allennlp==2.10.1 \
     tner==0.2.4 \
     fairscale==0.4.6 \
     wandb \
