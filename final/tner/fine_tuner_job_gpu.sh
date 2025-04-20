@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name="TNER Fine Tuning"
-#SBATCH --time=00:20:00
+#SBATCH --time=09:00:00
 #SBATCH --mem-per-cpu=32GB
 #SBATCH --cpus-per-task=2
-#SBATCH --qos=job_gpu_debug
-#SBATCH --partition=gpu
+#SBATCH --qos=job_gpu_preemptable
+#_SBATCH --partition=gpu-invest
 #_SBATCH --gres=gpu:rtx3090:1
 #_SBATCH --gres=gpu:rtx4090:1
 #_SBATCH --gres=gpu:a100:1
@@ -52,7 +52,7 @@ module load Anaconda3
 echo "'conda run' for language ${languages[$SLURM_ARRAY_TASK_ID]}"
 
 # Running the actual job
-apptainer exec --nv \
+apptainer exec --nv --cleanenv \
     -B "$(pwd)":/workspace \
     vkovtun-tner-gpu.sif \
     conda run -n pytorch-env python3 /workspace/tner_fine_tuner_wikiann.py ${languages[$SLURM_ARRAY_TASK_ID]}
