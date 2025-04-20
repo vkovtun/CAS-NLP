@@ -1,0 +1,20 @@
+Bootstrap: docker
+From: vkovtun/tner-gpu:latest
+
+%labels
+    Author   "Viktor Kovtun <viktor.kovtun@unibe.ch>"
+    Version  "1.0"
+    Upstream "vkovtun/tner-gpu:latest"
+
+# No %post section needed – we inherit everything from the Docker image.
+# Add an environment block only if you want extra variables.
+%environment
+    # make Conda readily available
+    export PATH=/opt/anaconda/bin:$PATH
+    # (optional) default working directory
+    export WORKDIR=/workspace
+
+# The runscript runs whatever command the user supplies.
+%runscript
+    # Exec passes all arguments to the container entrypoint or shell
+    exec "$@"
