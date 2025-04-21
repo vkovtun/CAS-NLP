@@ -68,3 +68,6 @@ RUN conda run -n $CONDA_ENV pip install \
     tensorboardX \
     flask \
     "pyarrow<=12.0.1"
+
+# Downloading a model for convenience, so that we don't have to download it in the container.
+RUN conda run -n $CONDA_ENV python -c "from tner import TransformersNER; TransformersNER('tner/roberta-large-wnut2017')"
