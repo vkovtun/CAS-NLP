@@ -4,17 +4,17 @@
 #SBATCH --mem-per-cpu=32GB
 #SBATCH --cpus-per-task=2
 
-#SBATCH --qos=job_gpu_preemptable
-#SBATCH --partition=gpu-invest
+#_SBATCH --qos=job_gpu_preemptable
+#_SBATCH --partition=gpu-invest
 
-#_SBATCH --qos=job_gpu
-#_SBATCH --partition=gpu
+#SBATCH --qos=job_gpu
+#SBATCH --partition=gpu
 
 #_SBATCH --gres=gpu:rtx3090:1
 #_SBATCH --gres=gpu:rtx4090:1
-#_SBATCH --gres=gpu:a100:1
-#SBATCH --gres=gpu:h100:1
-#SBATCH --array=0-10
+#SBATCH --gres=gpu:a100:1
+#_SBATCH --gres=gpu:h100:1
+#SBATCH --array=0-2
 
 # Slavic languages we consider:
 # be – Belarusian (East Slavic)
