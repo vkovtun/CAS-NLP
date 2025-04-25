@@ -1,97 +1,154 @@
-from pathlib import Path
+from __future__ import annotations
+
+import re
+import warnings
+from typing import Dict, Iterable, List, Sequence, Tuple
+
 from tner import TransformersNER
-from typing import Dict, List, Tuple
+
+_SENT_RE = re.compile(r"[^.!?]+[.!?]?")
+_WS = set(" \t\n\r\f\v")
+
+# Common sub‑word prefixes across tokenisers
+_PREFIXES = ("Ġ", "▁", "##")
+
+# ANSI Formatting escape sequences
+ANSI_BOLD = "\033[1m"
+ANSI_BLUE = "\033[94m"
+ANSI_RESET = "\033[0m"
 
 
-def _token_char_spans(text: str, tokens: List[str]) -> List[Tuple[int, int]]:
+def _sentence_spans(text: str) -> List[Tuple[int, int]]:
+    """Return **absolute** ``(start, end)`` indices for every sentence.
+
+    Leading whitespace after a sentence boundary is **stripped**, so each span
+    starts exactly at the first non‑space character of its sentence.
     """
-    Return (start, end) character spans for every token, assuming tokens appear
-    in order in `text`.  This works for the default TNER tokens which are
-    whitespace‑split words.
-    """
-    spans = []
-    idx = 0
-    for tok in tokens:
-        # skip whitespace already consumed
-        while idx < len(text) and text[idx].isspace():
-            idx += 1
-
-        start = text.find(tok, idx)
-        # Fallback if exact match fails (rare with word‑level tokens)
-        if start == -1:
-            start = idx
-        end = start + len(tok)
-        spans.append((start, end))
-        idx = end
+    spans: List[Tuple[int, int]] = []
+    for m in _SENT_RE.finditer(text):
+        s, e = m.start(), m.end()
+        # Trim any leading spaces/tabs/newlines that sneak in after the period
+        while s < e and text[s] in _WS:
+            s += 1
+        spans.append((s, e))
     return spans
 
 
-def visualize_entities(text: str, model: TransformersNER) -> None:
+def _clean(tok: str) -> str:
+    while tok.startswith(_PREFIXES):
+        tok = tok[1:]
+    return tok
+
+
+def _spans_from_offset(sentence: str, *, sent_offset: int, tokenizer) -> List[Tuple[int, int]] | None:
+    """Return spans via `offset_mapping` if tokenizer supports it; else *None*."""
+    if callable(tokenizer):
+        try:
+            enc = tokenizer(
+                sentence,
+                add_special_tokens=False,
+                return_offsets_mapping=True,
+                return_attention_mask=False,
+            )
+            if "offset_mapping" in enc:
+                return [
+                    (s + sent_offset, e + sent_offset) for s, e in enc["offset_mapping"]
+                ]
+        except Exception:
+            pass
+    return None
+
+
+def _spans_by_search(sentence: str, *, tokens: Sequence[str], sent_offset: int) -> List[Tuple[int, int]]:
+    """Greedy deterministic search mapping tokens → char spans."""
+    spans: List[Tuple[int, int]] = []
+    i, n = 0, len(sentence)
+    for raw in tokens:
+        tok = _clean(raw)
+        if not tok:
+            spans.append((i + sent_offset, i + sent_offset))
+            continue
+        pos = sentence.find(tok, i)
+        if pos == -1:
+            pos = sentence.lower().find(tok.lower(), i)
+        if pos == -1:
+            raise ValueError(f"Token '{raw}' not found after index {i}:\n{sentence!r}")
+        start = pos
+        end = pos + len(tok)
+        spans.append((start + sent_offset, end + sent_offset))
+        i = end
+        if i > n:
+            raise AssertionError("Token alignment overflow – check input text.")
+    return spans
+
+
+def _render(text: str, ent_spans: Iterable[Tuple[int, int, str]]) -> str:
+    out, last = [], 0
+    for s, e, lbl in ent_spans:
+        out.append(text[last:s])
+        out.append(f"{ANSI_BOLD}{text[s:e]}{ANSI_RESET}[{ANSI_BLUE}{lbl}{ANSI_RESET}]")
+        last = e
+    out.append(text[last:])
+    return "".join(out)
+
+
+def visualize_entities(text: str, model: TransformersNER, min_prob: float | None = None) -> None:
+    """Print *text* with entities highlighted (ANSI).
+
+    Parameters
+    ----------
+    text : str
+        Raw input text.
+    model : TransformersNER
+        A TNER model instance.
+    min_prob : float, optional
+        Drop entities whose mean token probability is below this value.
     """
-    Pretty‑print `text` with entities from a TNER model highlighted.
+    tokenizer = getattr(model, "tokenizer", None)
 
-    Example
-    -------
-    >>> from tner import TransformersNER
-    >>> ner = TransformersNER("tner/roberta-large-wnut2017")
-    >>> visualize_entities(
-    ...     "Jacob Collier is a Grammy awarded English artist from London", ner
-    ... )
-    Jacob Collier[person] … London[location]
-    """
-    output: Dict = model.predict([text])
-    tokens: List[str] = output["input"][0]
-    entities: List[Dict] = output["entity_prediction"][0]
+    # 1. Sentence segmentation (whitespace‑trimmed)
+    sent_spans = _sentence_spans(text)
+    sentences = [text[s:e] for s, e in sent_spans]
 
-    token_spans = _token_char_spans(text, tokens)
+    # 2. Model inference
+    output: Dict = model.predict(sentences)
 
-    # Convert entity token positions → character spans
-    spans: List[Tuple[int, int, str]] = []
-    for ent in entities:
-        pos = ent["position"]
-        start_char = token_spans[pos[0]][0]
-        end_char = token_spans[pos[-1]][1]
-        spans.append((start_char, end_char, ent["type"]))
+    # 3. Build absolute entity spans
+    ent_spans: List[Tuple[int, int, str, float]] = []  # (start, end, label, prob)
+    for i_sent, (sent_start, _) in enumerate(sent_spans):
+        spans = _spans_from_offset(sentences[i_sent], sent_offset=sent_start, tokenizer=tokenizer)
+        if spans is None:
+            spans = _spans_by_search(
+                sentences[i_sent], tokens=output["input"][i_sent], sent_offset=sent_start
+            )
+        for ent in output["entity_prediction"][i_sent]:
+            pos = ent["position"]
+            start_char = spans[pos[0]][0]
+            end_char = spans[pos[-1]][1]
+            prob = float(sum(ent["probability"]) / len(ent["probability"]))
+            ent_spans.append((start_char, end_char, ent["type"], prob))
 
-    # Sort to ensure left‑to‑right rendering
-    spans.sort(key=lambda s: s[0])
+    # 4. Probability filter
+    if min_prob is not None:
+        before = len(ent_spans)
+        ent_spans = [t for t in ent_spans if t[3] >= min_prob]
+        if (removed := before - len(ent_spans)):
+            warnings.warn(
+                f"{removed} entities removed (prob < {min_prob:.2f}).",
+                RuntimeWarning,
+                stacklevel=2,
+            )
 
-    # ANSI styles
-    BOLD = "\033[1m"
-    BLUE = "\033[94m"
-    RESET = "\033[0m"
-
-    rendered = ""
-    last = 0
-    for start, end, label in spans:
-        rendered += text[last:start]
-        rendered += f"{BOLD}{text[start:end]}{RESET}[{BLUE}{label}{RESET}]"
-        last = end
-    rendered += text[last:]
-
-    print(rendered)
+    # 5. Render – ignore prob in output
+    ent_spans.sort(key=lambda t: t[0])
+    print(_render(text, ((s, e, l) for s, e, l, _ in ent_spans)))
 
 
-def get_lines_set(file_path):
-    """
-    Gets a set of lines from a path.
+def get_lines_set(file_path: str):
+    """Return a *set* of non‑empty, stripped lines from *file_path*."""
+    with open(file_path, "r", encoding="utf-8") as fh:
+        return {ln.strip() for ln in fh if ln.strip()}
 
-    :param file_path: The file to read from.
-    :return: A set of lines from the file.
-    """
-    lines_set = set()
-    with open(file_path, 'r') as file:
-        for line in file:
-            # Remove leading/trailing spaces and check if the line is not empty
-            line = line.strip()
-            if line:
-                lines_set.add(line)
-    return lines_set
-
-
-# SpaCy Transformers off the Shelf Model
-
-model = TransformersNER("tner/roberta-large-wnut2017")
 
 ## English
 
@@ -103,7 +160,9 @@ The war in Europe concluded with the liberation of German-occupied territories; 
 World War II changed the political alignment and social structure of the world, and it set the foundation of international relations for the rest of the 20th century and into the 21st century. The United Nations was established to foster international cooperation and prevent conflicts, with the victorious great powers—China, France, the Soviet Union, the UK, and the US—becoming the permanent members of its security council. The Soviet Union and the United States emerged as rival superpowers, setting the stage for the Cold War. In the wake of European devastation, the influence of its great powers waned, triggering the decolonisation of Africa and Asia. Most countries whose industries had been damaged moved towards economic recovery and expansion.
 """
 
-en_text = "The war in Europe concluded with the liberation of German-occupied territories; the invasion of Germany by the Western Allies and the Soviet Union, culminating in the fall of Berlin to Soviet troops; Hitler's suicide; and the German unconditional surrender on 8 May 1945."
+# en_text = "The war in Europe concluded with the liberation of German-occupied territories; the invasion of Germany by the Western Allies and the Soviet Union, culminating in the fall of Berlin to Soviet troops; Hitler's suicide; and the German unconditional surrender on 8 May 1945."
+en_text = "The war in Europe concluded with the liberation of German-occupied territories; the invasion of Germany by the Western Allies and the Soviet Union, culminating in the fall of Berlin to Soviet troops; Hitler's suicide; and the German unconditional surrender on 8 May 1945. Following the refusal of Japan to surrender on the terms of the Potsdam Declaration, the US dropped the first atomic bombs on Hiroshima and Nagasaki on 6 and 9 August. Faced with an imminent invasion of the Japanese archipelago, the possibility of further atomic bombings, and the Soviet declaration of war against Japan and its invasion of Manchuria, Japan announced its unconditional surrender on 15 August and signed a surrender document on 2 September 1945, marking the end of the war."
+# en_text = "Following the refusal of Japan to surrender on the terms of the Potsdam Declaration, the US dropped the first atomic bombs on Hiroshima and Nagasaki on 6 and 9 August. Faced with an imminent invasion of the Japanese archipelago, the possibility of further atomic bombings, and the Soviet declaration of war against Japan and its invasion of Manchuria, Japan announced its unconditional surrender on 15 August and signed a surrender document on 2 September 1945, marking the end of the war."
 
 # visualize_entities(en_text, model)
 
@@ -169,7 +228,11 @@ uk_text = """
 Друга світова стала наймасштабнішою та найкривавішою війною в історії людства, великим переламом XX століття, що докорінно змінив політичну карту і соціальну структуру світу. Для сприяння розвитку міжнародного співробітництва та запобігання майбутнім конфліктам створено Організацію Об'єднаних Націй. Післявоєнний порядок утвердив гегемонію Сполучених Штатів і Радянського Союзу, суперництво яких призвело до утворення капіталістичного й соціалістичного таборів та початку Холодної війни. Світовий вплив європейських держав значно ослаб, почався процес деколонізації Азії та Африки. Перед країнами, чиї галузі економіки були знищені, гостро стояла проблема їхнього відновлення. У Європі поряд з цим постало питання європейської інтеграції як способу подолання ворожнечі й створення спільної ідентичності. 
 """
 
-output = model.predict([en_text])
+# Off the Shelf Model
+
+model = TransformersNER("tner/roberta-large-wnut2017")
+
+# output = model.predict([en_text])
 visualize_entities(en_text, model)
 
 # visualize_entities(uk_text, model)
