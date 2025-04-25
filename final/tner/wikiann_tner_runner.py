@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import warnings
+import string
 from typing import Dict, Iterable, List, Sequence, Tuple
 
 from tner import TransformersNER
@@ -108,10 +109,17 @@ def visualize_entities(text: str, model: TransformersNER, min_prob: float | None
 
     # 1. Sentence segmentation (whitespace‑trimmed)
     sent_spans = _sentence_spans(text)
+
+    # print(f"sent_spans: {sent_spans}")
+
     sentences = [text[s:e] for s, e in sent_spans]
+
+    # print(f"sentences: {sentences}")
 
     # 2. Model inference
     output: Dict = model.predict(sentences)
+
+    # print(f"output: {output}")
 
     # 3. Build absolute entity spans
     ent_spans: List[Tuple[int, int, str, float]] = []  # (start, end, label, prob)
@@ -161,7 +169,7 @@ World War II changed the political alignment and social structure of the world, 
 """
 
 # en_text = "The war in Europe concluded with the liberation of German-occupied territories; the invasion of Germany by the Western Allies and the Soviet Union, culminating in the fall of Berlin to Soviet troops; Hitler's suicide; and the German unconditional surrender on 8 May 1945."
-en_text = "The war in Europe concluded with the liberation of German-occupied territories; the invasion of Germany by the Western Allies and the Soviet Union, culminating in the fall of Berlin to Soviet troops; Hitler's suicide; and the German unconditional surrender on 8 May 1945. Following the refusal of Japan to surrender on the terms of the Potsdam Declaration, the US dropped the first atomic bombs on Hiroshima and Nagasaki on 6 and 9 August. Faced with an imminent invasion of the Japanese archipelago, the possibility of further atomic bombings, and the Soviet declaration of war against Japan and its invasion of Manchuria, Japan announced its unconditional surrender on 15 August and signed a surrender document on 2 September 1945, marking the end of the war."
+# en_text = "The war in Europe concluded with the liberation of German-occupied territories; the invasion of Germany by the Western Allies and the Soviet Union, culminating in the fall of Berlin to Soviet troops; Hitler's suicide; and the German unconditional surrender on 8 May 1945. Following the refusal of Japan to surrender on the terms of the Potsdam Declaration, the US dropped the first atomic bombs on Hiroshima and Nagasaki on 6 and 9 August. Faced with an imminent invasion of the Japanese archipelago, the possibility of further atomic bombings, and the Soviet declaration of war against Japan and its invasion of Manchuria, Japan announced its unconditional surrender on 15 August and signed a surrender document on 2 September 1945, marking the end of the war."
 # en_text = "Following the refusal of Japan to surrender on the terms of the Potsdam Declaration, the US dropped the first atomic bombs on Hiroshima and Nagasaki on 6 and 9 August. Faced with an imminent invasion of the Japanese archipelago, the possibility of further atomic bombings, and the Soviet declaration of war against Japan and its invasion of Manchuria, Japan announced its unconditional surrender on 15 August and signed a surrender document on 2 September 1945, marking the end of the war."
 
 # visualize_entities(en_text, model)
@@ -233,11 +241,10 @@ uk_text = """
 model = TransformersNER("tner/roberta-large-wnut2017")
 
 # output = model.predict([en_text])
-visualize_entities(en_text, model)
+visualize_entities(uk_text, model)
 
 # visualize_entities(uk_text, model)
 
-# model_trained = TransformersNER("tner/roberta-large-wnut2017")
-# print(model_trained.pipe_names)
-#
-# visualize_entities(uk_text, model_trained)
+model_trained = TransformersNER("models/uk")
+
+visualize_entities(uk_text, model_trained)

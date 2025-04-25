@@ -8,7 +8,7 @@
 #_SBATCH --partition=gpu-invest
 
 #SBATCH --qos=job_gpu
-#SBATCH --partition=gpu
+#_SBATCH --partition=gpu
 
 #_SBATCH --gres=gpu:rtx3090:1
 #_SBATCH --gres=gpu:rtx4090:1
