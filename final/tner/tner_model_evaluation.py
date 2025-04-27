@@ -11,11 +11,12 @@ Example:
 import argparse
 from typing import List, Tuple
 
-from tner import TransformersNER
+from tner import TransformersNER, get_dataset
 from datasets import load_dataset
 from seqeval.metrics import classification_report, precision_score, recall_score, f1_score
 
 _PREFIXES: Tuple[str, ...] = ("Ġ", "▁", "##")
+LABEL_LIST = ['B-LOC', 'B-ORG', 'B-PER', 'I-LOC', 'I-ORG', 'I-PER', 'O' ]
 
 
 def _clean(tok: str) -> str:
@@ -47,18 +48,31 @@ def align_predictions_to_tokens(tokens: List[str], pred_input: List[str], ent_sp
     return labels
 
 
-def evaluate_model(model_name: str, dataset_name: str, config_name: str, split: str) -> None:
+def evaluate_model(model_name: str, language: str) -> None:
     """Run evaluation and print a seqeval report."""
     print(f"Loading model: {model_name} …")
     model = TransformersNER(model_name)
 
-    ds = load_dataset(dataset_name, config_name, split=split)
-    label_list = ds.features["ner_tags"].feature.names
+    data_files = {
+        "train": f"datasets/wikiann/{language}/train.txt",
+        "validation": f"datasets/wikiann/{language}/dev.txt",
+        "test": f"datasets/wikiann/{language}/test.txt"
+    }
+    # data_files = [f"datasets/wikiann/{language}/test.jsonl"]
+    ds, metadata = get_dataset(local_dataset=data_files)
+    ds_test = ds["test"]
+    ds_test_tokens = ds_test["tokens"]
+    ds_test_tags = ds_test["tags"]
+
+    if len(ds_test_tokens) != len(ds_test_tags):
+        raise ValueError(f"Number of tokens ({len(ds_test_tokens)}) does not match number of tags ({len(ds_test_tags)})")
 
     true_labels, pred_labels = [], []
-    for row in ds:
-        tokens = row["tokens"]
-        gold = [label_list[i] for i in row["ner_tags"]]
+    for i in range(0, len(ds_test_tokens)):
+        tokens = ds_test_tokens[i]
+        tags = ds_test_tags[i]
+
+        gold = [LABEL_LIST[i] for i in tags]
         sent = " ".join(tokens)
 
         outputs = model.predict([sent])
@@ -79,11 +93,9 @@ def main() -> None:
     """CLI wrapper."""
     parser = argparse.ArgumentParser(description="Evaluate a TNER model on an HF dataset")
     parser.add_argument("--model", default="tner/roberta-large-wnut2017", help="Model name or local path")
-    parser.add_argument("--dataset", default="tner/wikiann", help="HF dataset name or path")
-    parser.add_argument("--config", help="Config name if needed")
-    parser.add_argument("--split", default="test", help="Dataset split to evaluate")
+    parser.add_argument("--language", help="Language")
     args = parser.parse_args()
-    evaluate_model(args.model, args.dataset, args.config, args.split)
+    evaluate_model(args.model, args.language)
 
 
 if __name__ == "__main__":
