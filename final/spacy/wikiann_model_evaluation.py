@@ -113,7 +113,8 @@ def evaluate_model(language: str) -> None:
     scorer = Scorer()
     results = scorer.score(examples)                  # returns the metrics dict
 
-    print("\n=== Span‑level named‑entity evaluation ===")
+    print(f"\nLanguage: {language}")
+    print("Span‑level named‑entity evaluation:")
     print(f"Precision : {results['ents_p']:.4f}")
     print(f"Recall    : {results['ents_r']:.4f}")
     print(f"F1        : {results['ents_f']:.4f}")
