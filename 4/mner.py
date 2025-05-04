@@ -103,9 +103,9 @@ def get_lines_set(file_path):
                 lines_set.add(line)
     return lines_set
 
-# PER_WIKIDATA_ENTITIES = get_lines_set('PER-ND.txt') | get_lines_set('PER-FI.txt')
-# LOC_WIKIDATA_ENTITIES = get_lines_set('LOC-ND.txt')
-# ORG_WIKIDATA_ENTITIES = get_lines_set('ORG-ND.txt')
+PER_WIKIDATA_ENTITIES = get_lines_set('PER-ND.txt') | get_lines_set('PER-FI.txt')
+LOC_WIKIDATA_ENTITIES = get_lines_set('LOC-ND.txt')
+ORG_WIKIDATA_ENTITIES = get_lines_set('ORG-ND.txt')
 
 
 def get_entity_by_qid(qid):
@@ -228,7 +228,7 @@ def create_spacy_files(data_source, language):
     dev_ner = data_source['test'].shuffle().select(range(min(960000, len(data_source['test'])))).map(convert_row_wikianc)
     create_spacy_doc_bin_files(dataset=dev_ner, file_name='dev', output_dir=f'./{language}/dev', language='xx')
 
-    valid_ner = data_source['validation'].shuffle().select(range(480000, len(data_source['validation']))).map(convert_row_wikianc)
+    valid_ner = data_source['validation'].shuffle().select(range(min(4800000, len(data_source['validation'])))).map(convert_row_wikianc)
     create_spacy_doc_bin_files(dataset=valid_ner, file_name='validation', output_dir=f'./{language}/validation', language='xx')
 
 
