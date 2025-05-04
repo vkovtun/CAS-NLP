@@ -1,0 +1,133 @@
+=== BE ===
+Span‑level named‑entity evaluation:
+Precision : 0.9195
+Recall    : 0.9179
+F1        : 0.9187
+
+Per‑label breakdown:
+  LOC           P=0.9008  R=0.9271  F1=0.9138
+  ORG           P=0.9154  R=0.8808  F1=0.8978
+  PER           P=0.9482  R=0.9405  F1=0.9444
+
+
+=== BG ===
+Span‑level named‑entity evaluation:
+Precision : 0.9325
+Recall    : 0.9290
+F1        : 0.9307
+
+Per‑label breakdown:
+  LOC           P=0.9610  R=0.9497  F1=0.9554
+  ORG           P=0.8813  R=0.8696  F1=0.8754
+  PER           P=0.9334  R=0.9497  F1=0.9415
+
+
+
+=== CS ===
+Span‑level named‑entity evaluation:
+Precision : 0.9180
+Recall    : 0.9202
+F1        : 0.9191
+
+Per‑label breakdown:
+  LOC           P=0.9219  R=0.9166  F1=0.9193
+  ORG           P=0.8818  R=0.8806  F1=0.8812
+  PER           P=0.9495  R=0.9645  F1=0.9569
+
+
+=== HR ===
+Span‑level named‑entity evaluation:
+Precision : 0.9123
+Recall    : 0.9128
+F1        : 0.9126
+
+Per‑label breakdown:
+  LOC           P=0.8979  R=0.9207  F1=0.9091
+  ORG           P=0.8977  R=0.8632  F1=0.8801
+  PER           P=0.9412  R=0.9496  F1=0.9454
+
+
+=== MK ===
+Span‑level named‑entity evaluation:
+Precision : 0.9298
+Recall    : 0.9215
+F1        : 0.9256
+
+Per‑label breakdown:
+  LOC           P=0.9328  R=0.9366  F1=0.9347
+  ORG           P=0.9053  R=0.8768  F1=0.8908
+  PER           P=0.9470  R=0.9422  F1=0.9446
+
+
+=== PL ===
+Span‑level named‑entity evaluation:
+Precision : 0.9089
+Recall    : 0.9039
+F1        : 0.9064
+
+Per‑label breakdown:
+  LOC           P=0.9108  R=0.9219  F1=0.9163
+  ORG           P=0.8566  R=0.8338  F1=0.8451
+  PER           P=0.9511  R=0.9424  F1=0.9468
+
+
+
+=== RU ===
+Span‑level named‑entity evaluation:
+Precision : 0.8974
+Recall    : 0.8864
+F1        : 0.8919
+
+Per‑label breakdown:
+  LOC           P=0.9080  R=0.8955  F1=0.9017
+  ORG           P=0.8467  R=0.8132  F1=0.8296
+  PER           P=0.9352  R=0.9535  F1=0.9443
+
+
+=== SK ===
+Span‑level named‑entity evaluation:
+Precision : 0.9350
+Recall    : 0.9375
+F1        : 0.9363
+
+Per‑label breakdown:
+  LOC           P=0.9335  R=0.9431  F1=0.9383
+  ORG           P=0.9064  R=0.8971  F1=0.9017
+  PER           P=0.9612  R=0.9667  F1=0.9639
+
+
+=== SL ===
+Span‑level named‑entity evaluation:
+Precision : 0.9361
+Recall    : 0.9361
+F1        : 0.9361
+
+Per‑label breakdown:
+  LOC           P=0.9184  R=0.9382  F1=0.9282
+  ORG           P=0.9337  R=0.8992  F1=0.9161
+  PER           P=0.9614  R=0.9671  F1=0.9642
+
+
+
+=== SR ===
+Span‑level named‑entity evaluation:
+Precision : 0.9202
+Recall    : 0.9176
+F1        : 0.9189
+
+Per‑label breakdown:
+  LOC           P=0.9347  R=0.9464  F1=0.9405
+  ORG           P=0.8899  R=0.8663  F1=0.8780
+  PER           P=0.9331  R=0.9373  F1=0.9352
+
+
+=== UK ===
+Span‑level named‑entity evaluation:
+Precision : 0.9194
+Recall    : 0.9191
+F1        : 0.9192
+
+Per‑label breakdown:
+  LOC           P=0.9514  R=0.9345  F1=0.9429
+  ORG           P=0.8650  R=0.8761  F1=0.8705
+  PER           P=0.9265  R=0.9382  F1=0.9323
