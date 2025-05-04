@@ -141,9 +141,7 @@ def create_spacy_doc_bin_files(dataset, output_dir, file_name, nlp, tag_list, ch
             datum = dataset[j]
             tokens = datum['tokens']
             ner_tags = [tag_list[i] for i in datum['ner_tags']]
-
             doc = create_doc(tokens, ner_tags, nlp)
-
             db.add(doc)
 
         # Save the chunk to a new file
