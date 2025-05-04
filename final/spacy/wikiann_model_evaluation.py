@@ -21,7 +21,7 @@ from spacy.training import Example
 from tqdm.std import tqdm
 
 from datasets import load_dataset, Dataset, DatasetDict
-from seqeval.metrics import classification_report, precision_score, recall_score, f1_score
+from huggingface_hub import snapshot_download
 
 _PREFIXES: Tuple[str, ...] = ("Ġ", "▁", "##")
 LABEL_LIST = ['B-LOC', 'B-ORG', 'B-PER', 'I-LOC', 'I-ORG', 'I-PER', 'O' ]
@@ -88,10 +88,16 @@ def get_dataset(local_dataset: dict) -> Tuple[DatasetDict, dict]:
     return DatasetDict(dataset_dict), {}
 
 
-def evaluate_model(language: str) -> None:
+def evaluate_model(language: str, repo_id: str) -> None:
     """Evaluate the model at *entity‑span* level and print a spaCy report."""
     print(f"Loading model for language: {language} …")
-    model = spacy.load(Path(f"models/wikiann/{language}/model-best"))
+
+    model_path: Path
+    if repo_id:
+        model_path = snapshot_download(repo_id=repo_id, revision="main")
+    else:
+        model_path = Path(f"models/wikiann/{language}/model-best")
+    model = spacy.load(model_path)
 
     # --- load the gold‑standard validation set ----------------------------
     nlp: Language = spacy.blank(SPACY_BLANK_LANGUAGES[language])
@@ -128,9 +134,10 @@ def evaluate_model(language: str) -> None:
 def main() -> None:
     """CLI wrapper."""
     parser = argparse.ArgumentParser(description="Evaluate a TNER model on an HF dataset")
-    parser.add_argument("--language", help="Language")
+    parser.add_argument("--language", required=True, help="Language")
+    parser.add_argument("--repo_id", required=False, help="Spacy repo ID", default="spacy/xx_ent_wiki_sm", type=str)
     args = parser.parse_args()
-    evaluate_model(args.language)
+    evaluate_model(args.language, args.repo_id)
 
 
 if __name__ == "__main__":
