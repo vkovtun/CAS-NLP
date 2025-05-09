@@ -27,6 +27,7 @@
 
 languages=("be" "bg" "bs" "cs" "hr" "mk" "pl" "ru" "sk" "sl" "sr" "uk")
 
+language=${languages[$SLURM_ARRAY_TASK_ID]}
 echo "Launched at $(date)"
 echo "Job ID: ${SLURM_JOBID}"
 echo "Node list: ${SLURM_NODELIST}"
@@ -43,8 +44,35 @@ eval "$(conda shell.bash hook)"
 echo "conda activate mnre"
 conda activate mnre
 
-echo "SpaCy train for language ${languages[$SLURM_ARRAY_TASK_ID]}."
-python -m spacy train config/wikianc/${languages[$SLURM_ARRAY_TASK_ID]}.cfg --output models/wikianc/${languages[$SLURM_ARRAY_TASK_ID]} --gpu-id 0
+# Get max index from folders
+max_index=$(find datasets/wikianc/${language}/ -maxdepth 1 -type d -regex ".*/[0-9]+" | sed 's#.*/##' | sort -n | tail -n1)
+
+for index in $(seq 1 $max_index); do
+    echo "Training on ${language}, split $index"
+
+    cfg_file="config/wikianc/${language}.cfg"
+    out_dir="models/wikianc/${language}"
+
+    # Skip if model-best already exists for this index
+    if [ -f "$out_dir/model-best/model.cfg" ] && [ "$index" -eq "$max_index" ]; then
+        echo "Skipping ${language} split $index — final model already exists."
+        continue
+    fi
+
+    if [ "$index" -eq 1 ]; then
+        init_tok2vec_arg="--paths.init_tok2vec=null"
+    else
+        init_tok2vec_arg="--paths.init_tok2vec=$out_dir/model-best"
+    fi
+
+    python -m spacy train "$cfg_file" \
+      --output "$out_dir" \
+      --gpu-id 0 \
+      --paths.train "datasets/wikianc/${language}/${index}/train/" \
+      --paths.dev   "datasets/wikianc/${language}/${index}/dev/" \
+      $init_tok2vec_arg
+
+done
 
 echo "conda deactivate"
 conda deactivate
