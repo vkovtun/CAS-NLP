@@ -44,7 +44,7 @@ echo "conda activate mnre"
 conda activate mnre
 
 echo "SpaCy train for language ${languages[$SLURM_ARRAY_TASK_ID]}."
-python -m spacy train config/wikianc/${languages[$SLURM_ARRAY_TASK_ID]}.cfg --output models/wikianc/${languages[$SLURM_ARRAY_TASK_ID]} --gpu-id 0
+python -m spacy train config/wikianc/${languages[$SLURM_ARRAY_TASK_ID]}.cfg --output models/wikianc/cs.cfg${languages[$SLURM_ARRAY_TASK_ID]} --gpu-id 0
 
 echo "conda deactivate"
 conda deactivate
