@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name="Named entities recognition for Slavic Languages. SpaCy training."
 #SBATCH --time=24:00:00
-#SBATCH --mem-per-cpu=8GB
+#SBATCH --mem-per-cpu=64GB
 #SBATCH --cpus-per-task=2
 #SBATCH --qos=job_gpu_preemptable
 
