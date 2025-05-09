@@ -53,16 +53,14 @@ for index in $(seq 1 $max_index); do
     cfg_file="config/wikianc/${language}.cfg"
     out_dir="models/wikianc/${language}"
 
-    # Skip if model-best already exists for this index
-    if [ -f "$out_dir/model-best/model.cfg" ] && [ "$index" -eq "$max_index" ]; then
-        echo "Skipping ${language} split $index — final model already exists."
-        continue
-    fi
-
     if [ "$index" -eq 1 ]; then
         init_tok2vec_arg="--paths.init_tok2vec=null"
     else
-        init_tok2vec_arg="--paths.init_tok2vec=$out_dir/model-best"
+        tok2vec_path="${out_dir}/model-best/tok2vec_${language}.bin"
+        if [ ! -f "$tok2vec_path" ]; then
+          python -m spacy init tok2vec ${out_dir}/model-best "${tok2vec_path}"
+        fi
+        init_tok2vec_arg="--paths.init_tok2vec=${tok2vec_path}"
     fi
 
     python -m spacy train "$cfg_file" \
