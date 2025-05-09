@@ -38,8 +38,6 @@ echo "Node list: ${SLURM_NODELIST}"
 echo "Submit dir.: ${SLURM_SUBMIT_DIR}"
 echo "Numb. of cores: ${SLURM_CPUS_PER_TASK}"
 
-module load Anaconda3
-
 echo "'conda run' for language ${languages[$SLURM_ARRAY_TASK_ID]}"
 
 # Running the actual job
