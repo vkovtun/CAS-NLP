@@ -38,20 +38,6 @@ echo "Node list: ${SLURM_NODELIST}"
 echo "Submit dir.: ${SLURM_SUBMIT_DIR}"
 echo "Numb. of cores: ${SLURM_CPUS_PER_TASK}"
 
-# Get total RAM in GB
-total_ram_gb=$(awk '/MemTotal/ {printf "%.2f", $2 / 1024 / 1024}' /proc/meminfo)
-
-# Get total VRAM in GB (Assuming NVIDIA GPU)
-if command -v nvidia-smi &> /dev/null; then
-    total_vram_gb=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | awk '{printf "%.2f", $1 / 1024}')
-else
-    total_vram_gb="N/A"
-fi
-
-# Print results
-echo "Total RAM: ${total_ram_gb} GB"
-echo "Total VRAM: ${total_vram_gb} GB"
-
 module load Anaconda3
 
 echo "'conda run' for language ${languages[$SLURM_ARRAY_TASK_ID]}"
