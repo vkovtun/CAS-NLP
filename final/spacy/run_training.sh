@@ -64,12 +64,13 @@ for index in $(seq 1 $max_index); do
         init_tok2vec_arg="--paths.init_tok2vec=$tok2vec_path"
     fi
 
-    python -m spacy train "$cfg_file" \
+    python -m spacy train \
       --output "$out_dir" \
       --gpu-id 0 \
       --paths.train "datasets/wikianc/${language}/${index}/train/" \
       --paths.dev   "datasets/wikianc/${language}/${index}/dev/" \
-      ${init_tok2vec_arg}
+      ${init_tok2vec_arg} \
+      "$cfg_file"
 
 done
 
