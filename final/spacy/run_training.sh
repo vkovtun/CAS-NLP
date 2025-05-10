@@ -52,15 +52,12 @@ for index in $(seq 1 $max_index); do
 
     cfg_file="config/wikianc/${language}.cfg"
     out_dir="models/wikianc/${language}"
+    model_best_path="${out_dir}/model-best"
 
-    if [ "$index" -eq 1 ]; then
-        init_tok2vec_arg="--paths.init_tok2vec=null"
+    if [ "$index" -eq 1 ] || [ ! -f "${model_best_path}" ]; then
+        source_arg="--components.ner.source=null --components.transformer.source=null"
     else
-        tok2vec_path="${out_dir}/model-best/tok2vec_${language}.bin"
-        if [ ! -f "$tok2vec_path" ]; then
-          python -m spacy init tok2vec ${out_dir}/model-best "${tok2vec_path}"
-        fi
-        init_tok2vec_arg="--paths.init_tok2vec=${tok2vec_path}"
+        source_arg="--components.ner.source=${model_best_path} --components.transformer.source=${model_best_path}"
     fi
 
     python -m spacy train "$cfg_file" \
@@ -68,7 +65,7 @@ for index in $(seq 1 $max_index); do
       --gpu-id 0 \
       --paths.train "datasets/wikianc/${language}/${index}/train/" \
       --paths.dev   "datasets/wikianc/${language}/${index}/dev/" \
-      $init_tok2vec_arg
+      ${source_arg}
 
 done
 
