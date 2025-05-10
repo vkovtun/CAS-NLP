@@ -57,7 +57,7 @@ for index in $(seq 1 $max_index); do
     if [ "$index" -eq 1 ]; then
         init_tok2vec_arg="--paths.init_tok2vec=null"
     else
-        tok2vec_path="models/wikianc/${language}/tok2vec_${language}.bin"
+        tok2vec_path="models/wikianc/${language}/tok2vec.bin"
         if [ ! -f "$tok2vec_path" ]; then
             python extract_tok2vec.py models/wikianc/${language}/model-best "$tok2vec_path"
         fi
