@@ -55,9 +55,9 @@ for index in $(seq 1 $max_index); do
     model_best_path="${out_dir}/model-best"
 
     if [ "$index" -eq 1 ] || [ ! -f "${model_best_path}" ]; then
-        source_arg="--components.ner.source=null --components.transformer.source=null"
+        source_arg="--components.ner.source=null"
     else
-        source_arg="--components.ner.source=${model_best_path} --components.transformer.source=${model_best_path}"
+        source_arg="--components.ner.source=${model_best_path}"
     fi
 
     python -m spacy train "$cfg_file" \
