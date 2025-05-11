@@ -50,16 +50,13 @@ max_index=$(find datasets/wikianc/${language}/ -maxdepth 1 -type d -regex ".*/[0
 for index in $(seq 1 $max_index); do
     echo "Training on ${language}, split $index"
 
-    cfg_file="config/wikianc/${language}.cfg"
     out_dir="models/wikianc/${language}"
 
     if [ -d "$out_dir" ]; then
-        prev_model_dir="models/wikianc/${language}_prev"
-        extra_params="--paths.pretrained ${prev_model_dir}/model-last --components.transformer.factory null --components.ner.factory null"
-
-        mv ${out_dir} ${prev_model_dir}
+        cfg_file="config/wikianc/${language}_resume.cfg"
+        mv ${out_dir} "models/wikianc/${language}_prev"
     else
-        extra_params="--paths.ner_factory ner --paths.transformer_factory transformer --components.transformer.source null --components.ner.source null"
+        cfg_file="config/wikianc/${language}_fresh.cfg"
     fi
 
     python -m spacy train "$cfg_file" \
