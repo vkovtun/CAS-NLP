@@ -52,7 +52,7 @@ for index in $(seq 1 $max_index); do
 
     out_dir="models/wikianc/${language}"
 
-    if [ -d "$out_dir" ]; then
+    if [ -d "${out_dir}/model-last" ]; then
         cfg_file="config/wikianc/${language}_resume.cfg"
         mv ${out_dir} "models/wikianc/${language}_prev"
     else
