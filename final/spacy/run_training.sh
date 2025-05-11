@@ -59,7 +59,7 @@ for index in $(seq 1 $max_index); do
 
         mv ${out_dir} ${prev_model_dir}
     else
-        extra_params="--paths.ner_factory='ner' --paths.transformer_factory='transformer'"
+        extra_params="--paths.ner_factory=ner --paths.transformer_factory=transformer"
     fi
 
     python -m spacy train "$cfg_file" \
