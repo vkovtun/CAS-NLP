@@ -54,7 +54,7 @@ for index in $(seq 1 $max_index); do
 
     if [ -d "${out_dir}/model-last" ]; then
         cfg_file="config/wikianc/${language}_resume.cfg"
-        prev_out_dir = "models/wikianc/${language}_prev"
+        prev_out_dir="models/wikianc/${language}_prev"
         rm -rf -- ${prev_out_dir}
         mv -- ${out_dir} ${prev_out_dir}
     else
