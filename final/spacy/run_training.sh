@@ -55,11 +55,11 @@ for index in $(seq 1 $max_index); do
 
     if [ -d "$out_dir" ]; then
         prev_model_dir="models/wikianc/${language}_prev"
-        extra_params="--paths.pretrained ${prev_model_dir}/model-last"
+        extra_params="--paths.pretrained ${prev_model_dir}/model-last --components.transformer.factory null --components.ner.factory null"
 
         mv ${out_dir} ${prev_model_dir}
     else
-        extra_params="--paths.ner_factory ner --paths.transformer_factory transformer"
+        extra_params="--paths.ner_factory ner --paths.transformer_factory transformer --components.transformer.source null --components.ner.source null"
     fi
 
     python -m spacy train "$cfg_file" \
