@@ -68,7 +68,6 @@ for index in $(seq 1 $max_index); do
       --paths.train "datasets/wikianc/${language}/${index}/train/" \
       --paths.dev   "datasets/wikianc/${language}/${index}/dev/" \
       --training.max_epochs 4 \
-      --optimize accuracy \
       ${extra_params}
 
 done
