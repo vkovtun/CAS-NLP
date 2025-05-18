@@ -4,8 +4,7 @@ from typing import List
 
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 from seqeval.metrics import classification_report, precision_score, recall_score, f1_score
-
-LABEL_LIST = ['B-LOC', 'B-ORG', 'B-PER', 'I-LOC', 'I-ORG', 'I-PER', 'O']
+from datasets import Dataset
 
 
 def load_conll_txt(filepath: str):
@@ -25,7 +24,7 @@ def load_conll_txt(filepath: str):
                 if len(parts) >= 2:
                     tokens.append(parts[0])
                     tags.append(parts[-1])
-        if tokens:  # handle last sentence if no trailing newline
+        if tokens:
             sentences.append(tokens)
             labels.append(tags)
     return sentences, labels
@@ -65,28 +64,24 @@ def align_labels(tokens: List[str], entities: List[dict], sentence: str) -> List
     return labels
 
 
-
 def evaluate_model(model_name: str, language: str) -> None:
     print(f"Loading model: {model_name} …")
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForTokenClassification.from_pretrained(model_name)
-    ner = pipeline("ner", model=model, tokenizer=tokenizer, aggregation_strategy="first")
+    ner = pipeline("ner", model=model, tokenizer=tokenizer, aggregation_strategy="first", device=0)
 
     test_path = f"datasets/wikiann/{language}/test.txt"
     all_tokens, all_gold_labels = load_conll_txt(test_path)
+    sentences = [" ".join(tokens) for tokens in all_tokens]
+
+    dataset = Dataset.from_dict({"sentence": sentences})
+    predictions = ner(dataset["sentence"])
 
     true_labels, pred_labels = [], []
-    batch_size = 32
-    for i in range(0, len(all_tokens), batch_size):
-        token_batch = all_tokens[i:i + batch_size]
-        gold_batch = all_gold_labels[i:i + batch_size]
-        sentence_batch = [" ".join(tokens) for tokens in token_batch]
-        predictions_batch = ner(sentence_batch)
-
-        for tokens, gold, prediction, sentence in zip(token_batch, gold_batch, predictions_batch, sentence_batch):
-            pred = align_labels(tokens, prediction, sentence)
-            true_labels.append(gold)
-            pred_labels.append(pred)
+    for tokens, gold, sentence, prediction in zip(all_tokens, all_gold_labels, sentences, predictions):
+        pred = align_labels(tokens, prediction, sentence)
+        true_labels.append(gold)
+        pred_labels.append(pred)
 
     print(classification_report(true_labels, pred_labels, digits=4))
     print(f"Precision : {precision_score(true_labels, pred_labels):.4f}")
