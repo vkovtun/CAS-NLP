@@ -44,7 +44,7 @@ echo "Fine turing for language ${languages[$SLURM_ARRAY_TASK_ID]}"
 source .venv/bin/activate
 
 # Running the actual job
-python3 -m xlmr_fine_tuner_wikianc.py --language ${languages[$SLURM_ARRAY_TASK_ID]}
+python3 xlmr_fine_tuner_wikianc.py --language ${languages[$SLURM_ARRAY_TASK_ID]}
 
 # Environment cleanup
 deactivate
