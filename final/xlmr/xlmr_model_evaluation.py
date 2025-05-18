@@ -92,7 +92,7 @@ def evaluate_model(model_name: str, language: str) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate a 🤗 token classification model")
     parser.add_argument("--model", default="ivlcic/xlmr-ner-slavic", help="Model name or local path")
-    parser.add_argument("--language", help="Language")
+    parser.add_argument("--language", required=True, help="Language")
     args = parser.parse_args()
     evaluate_model(args.model, args.language)
 
