@@ -39,5 +39,13 @@ echo "Numb. of cores: ${SLURM_CPUS_PER_TASK}"
 
 echo "Fine turing for language ${languages[$SLURM_ARRAY_TASK_ID]}"
 
+# Environment setup
+#python -m venv .venv
+source .venv/bin/activate
+
 # Running the actual job
 python3 -m xlmr_fine_tuner_wikianc.py --language ${languages[$SLURM_ARRAY_TASK_ID]}
+
+# Environment cleanup
+deactivate
+#rm -r .venv
