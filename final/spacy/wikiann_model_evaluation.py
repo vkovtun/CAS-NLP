@@ -5,7 +5,7 @@ NER Model Evaluation Script
 Evaluate a Hugging Face **TNER** checkpoint on an NER dataset and print precision, recall, and F1.
 
 Example:
-    python ner_evaluate.py --model models/cs --dataset wnut_17 --split test
+    python wikiann_model_evaluation.py --language bs --repo_id spacy/xx_ent_wiki_sm
 """
 
 import argparse
@@ -60,10 +60,10 @@ def align_predictions_to_tokens(tokens: List[str], pred_input: List[str], ent_sp
 
 def get_dataset(local_dataset: dict) -> Tuple[DatasetDict, dict]:
     """Load dataset from local files.
-    
+
     Args:
         local_dataset: Dictionary containing paths to train, validation and test files
-        
+
     Returns:
         Tuple containing dataset and metadata
     """
@@ -94,15 +94,15 @@ def evaluate_model(language: str, repo_id: str) -> None:
 
     model_path: Path
     if repo_id:
-        model_path = snapshot_download(repo_id=repo_id, revision="main")
+        model_path = Path(snapshot_download(repo_id=repo_id, revision="main"))
     else:
-        model_path = Path(f"models/wikiann/{language}/model-best")
+        model_path = Path(f"models/wikiannc/{language}/model-best")
     model = spacy.load(model_path)
 
     # --- load the gold‑standard validation set ----------------------------
     nlp: Language = spacy.blank(SPACY_BLANK_LANGUAGES[language])
 
-    validation_files = glob.glob(f"datasets/wikiann/{language}/validation/*.spacy")
+    validation_files = glob.glob(f"datasets/wikianc_validation/{language}/validation/*.spacy")
     print(f"Loading {len(validation_files)} validation files...")
     gold_docs: List[Doc] = []
     for file in validation_files:
@@ -118,6 +118,9 @@ def evaluate_model(language: str, repo_id: str) -> None:
 
     scorer = Scorer()
     results = scorer.score(examples)                  # returns the metrics dict
+
+    if results is None:
+        raise ValueError("results is None")
 
     print(f"\nLanguage: {language}")
     print("Span‑level named‑entity evaluation:")
