@@ -87,8 +87,8 @@ class FineTuner:
         args = parser.parse_args()
 
 
-        dataset_dir=f"datasets/wikianc/{args.language}"
-        output_dir=f"models/wikianc/{args.language}"
+        dataset_dir=f"datasets/wikiann/{args.language}"
+        output_dir=f"models/wikiann/{args.language}"
         model = args.model
 
         self.tokenizer = AutoTokenizer.from_pretrained(model)

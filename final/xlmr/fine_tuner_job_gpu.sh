@@ -49,3 +49,5 @@ python3 xlmr_fine_tuner_wikianc.py --language ${languages[$SLURM_ARRAY_TASK_ID]}
 # Environment cleanup
 deactivate
 #rm -r .venv
+
+echo "Complete"

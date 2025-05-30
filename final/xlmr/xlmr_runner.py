@@ -101,11 +101,12 @@ def main():
 
 
     # Build pipeline once; reuse for many calls
-    tokenizer = AutoTokenizer.from_pretrained("ivlcic/xlmr-ner-slavic")
-    model = AutoModelForTokenClassification.from_pretrained("ivlcic/xlmr-ner-slavic")
+    model_path = "models/wikiann/uk"
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model = AutoModelForTokenClassification.from_pretrained(model_path)
     ner = pipeline("ner", model=model, tokenizer=tokenizer, aggregation_strategy="first")
 
-    visualize_entities(cs_text, ner)
+    # visualize_entities(cs_text, ner)
     visualize_entities(uk_text, ner)
 
 
