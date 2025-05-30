@@ -27,6 +27,19 @@ from utils.model_loader import load_model
 
 st.set_page_config(page_title="NER App", layout="wide")
 
+# Sidebar
+st.sidebar.title("Language Selection")
+AVAILABLE_LANGUAGES = ["be", "bg", "cs", "hr", "mk", "pl", "ru", "sk", "sl", "sr", "uk"]
+
+if "selected_language" not in st.session_state:
+    st.session_state["selected_language"] = AVAILABLE_LANGUAGES[0]
+
+st.session_state["selected_language"] = st.sidebar.selectbox(
+    "Select a model:",
+    options=AVAILABLE_LANGUAGES,
+    index=AVAILABLE_LANGUAGES.index(st.session_state["selected_language"])
+)
+
 # Load the model only once
 if "model" not in st.session_state:
     with st.spinner("Loading NER model... Please wait."):
