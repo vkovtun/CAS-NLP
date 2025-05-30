@@ -1,9 +1,9 @@
-import streamlit as st
-import spacy
 import random
-from spacy import displacy
-from pathlib import Path
 from io import StringIO
+
+import streamlit as st
+from spacy import displacy
+
 from utils.ui_components import setup_sidebar_and_model
 
 st.set_page_config(page_title="File input NER")

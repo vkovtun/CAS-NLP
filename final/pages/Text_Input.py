@@ -1,8 +1,7 @@
 import streamlit as st
-import spacy
 from spacy import displacy
-from pathlib import Path
 from spacy_streamlit import visualize_ner
+
 from utils.ui_components import setup_sidebar_and_model
 
 st.set_page_config(page_title="Text input NER")
