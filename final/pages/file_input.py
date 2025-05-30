@@ -4,16 +4,11 @@ import random
 from spacy import displacy
 from pathlib import Path
 from io import StringIO
+from utils.ui_components import setup_sidebar_and_model
 
-st.set_page_config(
-        page_title="File input NER",
-)
+st.set_page_config(page_title="File input NER")
 
-
-if 'model' not in st.session_state:
-    model = spacy.load(Path('model_wikianc_uk_2/model-best'))
-    st.session_state['model'] = model
-
+language, model = setup_sidebar_and_model()
 
 st.write("You can also upload a file of raw text and the output will be an HTML file.")
 
