@@ -5,9 +5,9 @@ import streamlit as st
 
 # TODO: add language selector
 # DEST_ZIP = "model_wikianc_uk_2.zip"
-DEST_DIR = "spacy/models/wikiann/uk"
-MODEL_BEST_DIR = f"{DEST_DIR}/model-best"
-MODEL_FILE = f"{MODEL_BEST_DIR}/transformer/model"
+WIKIANN_PATH = "spacy/models/wikiann"
+MODEL_BEST_DIR = "model-best"
+# MODEL_FILE = f"{MODEL_BEST_DIR}/transformer/model"
 
 # TODO: Uncomment these later and make sure it works with a file from Google Drive.
 
@@ -59,10 +59,10 @@ MODEL_FILE = f"{MODEL_BEST_DIR}/transformer/model"
 #     print(f"Done! Files are in '{DEST_DIR}'.")
 
 @st.cache_resource
-def load_model():
+def load_model(language):
     try:
         print("Attempting to load SpaCy model...", flush=True)
-        model = spacy.load(Path(MODEL_BEST_DIR))
+        model = spacy.load(Path(WIKIANN_PATH, language, MODEL_BEST_DIR))
         print("SpaCy model loaded!", flush=True)
         return model
     except Exception as e:

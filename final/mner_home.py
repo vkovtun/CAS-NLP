@@ -41,11 +41,16 @@ st.session_state["selected_language"] = st.sidebar.selectbox(
 )
 
 # Load the model only once
+language = st.session_state["selected_language"]
+
 if "model" not in st.session_state:
+    st.session_state["model"] = {}
+
+if language not in st.session_state["model"]:
     with st.spinner("Loading NER model... Please wait."):
         try:
-            model = load_model()
-            st.session_state["model"] = model
+            model = load_model(language)
+            st.session_state["model"][language] = model
         except Exception as e:
             st.error(f"Failed to load the model: {e}")
             st.stop()  # Stop here if load fails
@@ -53,7 +58,7 @@ if "model" not in st.session_state:
     # Stop rendering further until model is set
     st.rerun()  # optional: force refresh to clean up the UI
 else:
-    model = st.session_state["model"]
+    model = st.session_state["model"][language]
 
 st.markdown("# NER tagger app")
 st.markdown("This is a named entity recognition app for Slavic languages from SpaCy.")
