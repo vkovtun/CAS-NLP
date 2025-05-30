@@ -1,0 +1,46 @@
+import os
+import zipfile
+from pathlib import Path
+from huggingface_hub import snapshot_download
+
+import gdown
+import spacy
+import streamlit as st
+from utils.model_loader import load_model
+
+# @st.cache_resource
+# def load_model():
+#     try:
+#         print("Attempting to load SpaCy model...", flush=True)
+#         model = spacy.load(Path('model_wikianc_uk_2/model-best'))
+#         print("SpaCy model loaded!", flush=True)
+#         return model
+#     except Exception as e:
+#         print("Failed to load SpaCy model:", e, flush=True)
+#         raise
+
+# if not os.path.isdir(DEST_DIR):
+#     print(f"Path '{DEST_DIR}' does not exist. Triggering download...")
+#     download_and_extract()
+# else:
+#     print(f"'{DEST_DIR}' already exists. Skipping download.")
+
+st.set_page_config(page_title="NER App", layout="wide")
+
+# Load the model only once
+if "model" not in st.session_state:
+    with st.spinner("Loading NER model... Please wait."):
+        try:
+            model = load_model()
+            st.session_state["model"] = model
+        except Exception as e:
+            st.error(f"Failed to load the model: {e}")
+            st.stop()  # Stop here if load fails
+
+    # Stop rendering further until model is set
+    st.rerun()  # optional: force refresh to clean up the UI
+else:
+    model = st.session_state["model"]
+
+st.markdown("# NER tagger app")
+st.markdown("This is a named entity recognition app for Slavic languages from SpaCy.")
