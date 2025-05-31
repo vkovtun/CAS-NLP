@@ -16,7 +16,7 @@ babel==2.17.0
 beautifulsoup4==4.13.4
 bleach==6.2.0
 blinker==1.9.0
-blis>=0.7.11,<0.8
+blis
 cachetools==5.5.2
 catalogue==2.0.10
 certifi==2025.1.31
@@ -167,7 +167,7 @@ streamlit==1.45.1
 sympy==1.13.1
 tenacity==9.1.2
 terminado==0.18.1
-thinc==8.3.4
+thinc
 threadpoolctl==3.6.0
 tinycss2==1.4.0
 tokenizers==0.21.1
