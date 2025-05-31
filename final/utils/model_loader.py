@@ -1,9 +1,11 @@
 import os
 import re
+import time
 import zipfile
 from pathlib import Path
 
 import gdown
+import psutil
 import spacy
 import streamlit as st
 
@@ -82,7 +84,11 @@ def load_model(language):
             print(f"Path {str(path)} does not exist. Fetching the model from Google Drive.", flush=True)
             download_and_extract(language)
 
-        model = spacy.load(path)
+        model = spacy.load(path, exclude=["tagger","parser"])
+        print("Loaded, RSS =", psutil.Process().memory_info().rss/1e6, "MB", flush=True)
+
+        time.sleep(3)
+
         print("SpaCy model loaded!", flush=True)
         return model
     except Exception as e:
