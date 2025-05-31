@@ -79,8 +79,9 @@ def load_model(language):
         path = Path(MODELS_PATH, WIKIANN_DIR, language, MODEL_BEST_DIR)
 
         if not path.exists():
-            print(f"Path {str(path)} does not exist. Fetching the model from Google Drive.", flush=True)
-            download_and_extract(language)
+            # print(f"Path {str(path)} does not exist. Fetching the model from Google Drive.", flush=True)
+            # download_and_extract(language)
+            raise RuntimeError(f"Could not load model. Path {str(path)} is not found.")
 
         model = spacy.load(path, exclude=["tagger","parser"])
         print("SpaCy model loaded!", flush=True)
