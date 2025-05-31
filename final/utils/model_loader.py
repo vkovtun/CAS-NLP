@@ -51,7 +51,7 @@ def unzip(file, output):
 def download_and_extract(language):
     models_folder_id = os.environ["MODELS_FOLDER_ID"]
 
-    print(f"Downloading ZIP file for language {language}...")
+    print(f"Downloading ZIP file for language {language}...", flush=True)
     wikiann_path = Path(MODELS_PATH, WIKIANN_DIR)
     model_file_id = get_file_id(models_folder_id, language)
 
@@ -60,16 +60,16 @@ def download_and_extract(language):
     download(model_file_id, str(zip_file_path))
 
     dest_dir = Path(MODELS_PATH, WIKIANN_DIR, language)
-    print(f"Unzipping {zip_file_path}...")
+    print(f"Unzipping {zip_file_path}...", flush=True)
     unzip(zip_file_path, dest_dir)
 
-    print("Contents of DEST_DIR:")
+    print("Contents of DEST_DIR:", flush=True)
     print(os.listdir(dest_dir))
 
-    print("Cleaning up...")
+    print("Cleaning up...", flush=True)
     os.remove(zip_file_path)
 
-    print(f"Done! Files are in '{dest_dir}'.")
+    print(f"Done! Files are in '{dest_dir}'.", flush=True)
 
 
 @st.cache_resource
