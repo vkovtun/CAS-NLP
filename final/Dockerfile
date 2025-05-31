@@ -35,8 +35,8 @@ COPY spacy/models/wikiann /app/spacy/models/wikiann
 
 # Copy application code
 WORKDIR /app
-COPY pages .
-COPY utils .
+COPY pages/ pages/
+COPY utils/ utils/
 COPY Home.py .
 
 # Make Streamlit listen on all interfaces in the container
