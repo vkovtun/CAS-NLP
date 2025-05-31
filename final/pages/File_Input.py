@@ -17,7 +17,6 @@ if uploaded_file is not None:
     stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
     text = stringio.read()
 
-    model = st.session_state['model']
     html = displacy.render(model(text), style="ent")
 
     file_name = f"tagged_text_{random.randint(10000,100000)}.html"
