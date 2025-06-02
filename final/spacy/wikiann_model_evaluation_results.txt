@@ -1,5 +1,5 @@
 === BE ===
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.3869
 Recall    : 0.3811
@@ -9,7 +9,6 @@ Per‑label breakdown:
   LOC           P=0.3827  R=0.2854  F1=0.3270
   ORG           P=0.3770  R=0.0669  F1=0.1136
   PER           P=0.4202  R=0.7973  F1=0.5504
-
 
 -- Fine tuned --
 Span‑level named‑entity evaluation:
@@ -22,9 +21,8 @@ Per‑label breakdown:
   ORG           P=0.9154  R=0.8808  F1=0.8978
   PER           P=0.9482  R=0.9405  F1=0.9444
 
-
 === BG ===
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.5355
 Recall    : 0.5630
@@ -50,7 +48,7 @@ Per‑label breakdown:
 
 
 === CS ===
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.4749
 Recall    : 0.4465
@@ -75,46 +73,7 @@ Per‑label breakdown:
 
 
 === HR ===
--- spacy/hr_core_news_lg --
-Span‑level named‑entity evaluation:
-Precision : 0.5645
-Recall    : 0.5697
-F1        : 0.5671
-
-Per‑label breakdown:
-  DERIV_PER     P=0.0000  R=0.0000  F1=0.0000
-  LOC           P=0.6573  R=0.6319  F1=0.6443
-  MISC          P=0.0000  R=0.0000  F1=0.0000
-  ORG           P=0.4875  R=0.3004  F1=0.3717
-  PER           P=0.6807  R=0.7475  F1=0.7125
-
--- spacy/hr_core_news_md --
-Span‑level named‑entity evaluation:
-Precision : 0.5428
-Recall    : 0.5313
-F1        : 0.5370
-
-Per‑label breakdown:
-  DERIV_PER     P=0.0000  R=0.0000  F1=0.0000
-  LOC           P=0.6526  R=0.5815  F1=0.6150
-  MISC          P=0.0000  R=0.0000  F1=0.0000
-  ORG           P=0.4591  R=0.2580  F1=0.3304
-  PER           P=0.6229  R=0.7260  F1=0.6705
-
--- spacy/hr_core_news_sm --
-Span‑level named‑entity evaluation:
-Precision : 0.4355
-Recall    : 0.4196
-F1        : 0.4274
-
-Per‑label breakdown:
-  DERIV_PER     P=0.0000  R=0.0000  F1=0.0000
-  LOC           P=0.6035  R=0.4615  F1=0.5230
-  MISC          P=0.0000  R=0.0000  F1=0.0000
-  ORG           P=0.2629  R=0.1807  F1=0.2142
-  PER           P=0.5405  R=0.5921  F1=0.5651
-
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.4296
 Recall    : 0.4817
@@ -139,7 +98,7 @@ Per‑label breakdown:
 
 
 === MK ===
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.4318
 Recall    : 0.4838
@@ -164,7 +123,7 @@ Per‑label breakdown:
 
 
 === PL ===
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.6323
 Recall    : 0.6273
@@ -190,7 +149,7 @@ Per‑label breakdown:
 
 
 === RU ===
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.3394
 Recall    : 0.3922
@@ -201,54 +160,6 @@ Per‑label breakdown:
   ORG           P=0.6571  R=0.1585  F1=0.2554
   PER           P=0.1393  R=0.2281  F1=0.1730
 
-
--- spacy/ru_core_news_lg --
-Span‑level named‑entity evaluation:
-Precision : 0.3361
-Recall    : 0.3754
-F1        : 0.3547
-
-Per‑label breakdown:
-  LOC           P=0.6255  R=0.6164  F1=0.6209
-  ORG           P=0.3561  R=0.2199  F1=0.2719
-  PER           P=0.1188  R=0.2181  F1=0.1538
-
--- spacy/ru_core_news_md --
-Span‑level named‑entity evaluation:
-Precision : 0.3396
-Recall    : 0.3637
-F1        : 0.3512
-
-Per‑label breakdown:
-  LOC           P=0.6171  R=0.5923  F1=0.6045
-  ORG           P=0.3600  R=0.2161  F1=0.2701
-  PER           P=0.1240  R=0.2148  F1=0.1572
-
--- spacy/ru_core_news_sm --
-Span‑level named‑entity evaluation:
-Precision : 0.3365
-Recall    : 0.3780
-F1        : 0.3560
-
-Per‑label breakdown:
-  LOC           P=0.6276  R=0.6138  F1=0.6206
-  ORG           P=0.3406  R=0.2282  F1=0.2733
-  PER           P=0.1224  R=0.2217  F1=0.1577
-
--- Dessan/ru_spacy_ru_updated --
-Span‑level named‑entity evaluation:
-Precision : 0.3782
-Recall    : 0.3287
-F1        : 0.3517
-
-Per‑label breakdown:
-  BOMB          P=0.0000  R=0.0000  F1=0.0000
-  DATE          P=0.0000  R=0.0000  F1=0.0000
-  LOC           P=0.6024  R=0.5375  F1=0.5681
-  MONEY         P=0.0000  R=0.0000  F1=0.0000
-  ORG           P=0.5043  R=0.1968  F1=0.2831
-  PER           P=0.1512  R=0.1894  F1=0.1682
-  PRODUCT       P=0.0000  R=0.0000  F1=0.0000
 
 -- Fine tuned --
 Span‑level named‑entity evaluation:
@@ -263,7 +174,7 @@ Per‑label breakdown:
 
 
 === SK ===
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.4765
 Recall    : 0.4841
@@ -288,48 +199,7 @@ Per‑label breakdown:
 
 
 === SL ===
--- spacy/sl_core_news_lg --
-Span‑level named‑entity evaluation:
-Precision : 0.5390
-Recall    : 0.4629
-F1        : 0.4981
-
-Per‑label breakdown:
-  DERIV_PER     P=0.0000  R=0.0000  F1=0.0000
-  LOC           P=0.6617  R=0.5115  F1=0.5770
-  MISC          P=0.0000  R=0.0000  F1=0.0000
-  ORG           P=0.3151  R=0.1278  F1=0.1818
-  PER           P=0.5821  R=0.7066  F1=0.6384
-
--- spacy/sl_core_news_md --
-Span‑level named‑entity evaluation:
-Precision : 0.5238
-Recall    : 0.4541
-F1        : 0.4864
-
-Per‑label breakdown:
-  DERIV_PER     P=0.0000  R=0.0000  F1=0.0000
-  LOC           P=0.6582  R=0.4943  F1=0.5646
-  MISC          P=0.0000  R=0.0000  F1=0.0000
-  ORG           P=0.2785  R=0.1024  F1=0.1498
-  PER           P=0.5472  R=0.7236  F1=0.6232
-
-
--- spacy/sl_core_news_sm --
-Span‑level named‑entity evaluation:
-Precision : 0.4465
-Recall    : 0.3386
-F1        : 0.3851
-
-Per‑label breakdown:
-  DERIV_PER     P=0.0000  R=0.0000  F1=0.0000
-  LOC           P=0.6094  R=0.3670  F1=0.4581
-  MISC          P=0.0000  R=0.0000  F1=0.0000
-  ORG           P=0.2679  R=0.0887  F1=0.1332
-  PER           P=0.4318  R=0.5304  F1=0.4760
-
-
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.4897
 Recall    : 0.5161
@@ -355,7 +225,7 @@ Per‑label breakdown:
 
 
 === SR ===
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.2417
 Recall    : 0.2885
@@ -365,7 +235,6 @@ Per‑label breakdown:
   LOC           P=0.0643  R=0.0978  F1=0.0776
   ORG           P=0.5257  R=0.0782  F1=0.1361
   PER           P=0.3825  R=0.6551  F1=0.4830
-
 
 -- Fine tuned --
 Span‑level named‑entity evaluation:
@@ -378,10 +247,8 @@ Per‑label breakdown:
   ORG           P=0.8899  R=0.8663  F1=0.8780
   PER           P=0.9331  R=0.9373  F1=0.9352
 
-
-
 === UK ===
--- spacy/xx_ent_wiki_sm --
+-- Off-the-shelf--
 Span‑level named‑entity evaluation:
 Precision : 0.3765
 Recall    : 0.3960
@@ -391,43 +258,6 @@ Per‑label breakdown:
   LOC           P=0.4492  R=0.3726  F1=0.4073
   ORG           P=0.1857  R=0.0771  F1=0.1090
   PER           P=0.4016  R=0.7451  F1=0.5219
-
-
--- spacy/uk_core_news_lg --
-Span‑level named‑entity evaluation:
-Precision : 0.4796
-Recall    : 0.4032
-F1        : 0.4381
-
-Per‑label breakdown:
-  LOC           P=0.5611  R=0.4642  F1=0.5080
-  ORG           P=0.4620  R=0.2050  F1=0.2840
-  PER           P=0.4052  R=0.5072  F1=0.4505
-
-
--- spacy/uk_core_news_md --
-Span‑level named‑entity evaluation:
-Precision : 0.4913
-Recall    : 0.4226
-F1        : 0.4544
-
-Per‑label breakdown:
-  LOC           P=0.5566  R=0.4853  F1=0.5185
-  ORG           P=0.4754  R=0.2068  F1=0.2882
-  PER           P=0.4292  R=0.5412  F1=0.4787
-
-
--- spacy/uk_core_news_sm --
-Span‑level named‑entity evaluation:
-Precision : 0.4525
-Recall    : 0.3893
-F1        : 0.4185
-
-Per‑label breakdown:
-  LOC           P=0.5940  R=0.4355  F1=0.5025
-  ORG           P=0.4105  R=0.2183  F1=0.2850
-  PER           P=0.3554  R=0.4887  F1=0.4115
-
 
 -- Fine tuned --
 Span‑level named‑entity evaluation:
