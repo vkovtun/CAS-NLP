@@ -17,6 +17,7 @@
 #SBATCH --array=0-10
 
 # Slavic languages we consider:
+# be – Belarusian (East Slavic)
 # bg – Bulgarian (South Slavic)
 # bs – Bosnian (South Slavic)
 # cs – Czech (West Slavic)
@@ -29,7 +30,7 @@
 # sr – Serbian (South Slavic)
 # uk – Ukrainian (East Slavic)
 
-languages=("bg" "bs" "cs" "hr" "mk" "pl" "ru" "sk" "sl" "sr" "uk")
+languages=("be", "bg" "bs" "cs" "hr" "mk" "pl" "ru" "sk" "sl" "sr" "uk")
 
 echo "Launched at $(date)"
 echo "Job ID: ${SLURM_JOBID}"
@@ -44,7 +45,7 @@ echo "Fine turing for language ${languages[$SLURM_ARRAY_TASK_ID]}"
 source .venv/bin/activate
 
 # Running the actual job
-python3 xlmr_fine_tuner_wikianc.py --language ${languages[$SLURM_ARRAY_TASK_ID]}
+python3 xlmr_fine_tuner_wikiann.py --language ${languages[$SLURM_ARRAY_TASK_ID]}
 
 # Environment cleanup
 deactivate
