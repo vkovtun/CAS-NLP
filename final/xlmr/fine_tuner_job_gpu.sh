@@ -30,7 +30,7 @@
 # sr – Serbian (South Slavic)
 # uk – Ukrainian (East Slavic)
 
-languages=("be", "bg" "bs" "cs" "hr" "mk" "pl" "ru" "sk" "sl" "sr" "uk")
+languages=("be" "bg" "bs" "cs" "hr" "mk" "pl" "ru" "sk" "sl" "sr" "uk")
 
 echo "Launched at $(date)"
 echo "Job ID: ${SLURM_JOBID}"
