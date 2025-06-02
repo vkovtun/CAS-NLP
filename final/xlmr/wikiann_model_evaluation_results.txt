@@ -1,0 +1,295 @@
+=== BE ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.6811    0.7208    0.7004       480
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.7159    0.5640    0.6309       344
+         PER     0.8145    0.8784    0.8453       370
+
+   micro avg     0.7232    0.7245    0.7238      1194
+   macro avg     0.5529    0.5408    0.5441      1194
+weighted avg     0.7325    0.7245    0.7253      1194
+
+Precision : 0.7232
+Recall    : 0.7245
+F1        : 0.7238
+
+-- Fine tuned wikiann --
+
+
+
+=== BG ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.8836    0.9290    0.9058      6466
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.8224    0.6265    0.7112      3681
+         PER     0.8639    0.8974    0.8803      4074
+
+   micro avg     0.8509    0.8416    0.8462     14221
+   macro avg     0.6425    0.6132    0.6243     14221
+weighted avg     0.8621    0.8416    0.8481     14221
+
+Precision : 0.8509
+Recall    : 0.8416
+F1        : 0.8462
+
+-- Fine tuned wikiann --
+
+
+=== BS ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.9804    0.9752    0.9778       565
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.9781    0.9650    0.9715       371
+         PER     0.9709    0.9839    0.9774       373
+
+   micro avg     0.9748    0.9748    0.9748      1309
+   macro avg     0.7324    0.7310    0.7317      1309
+weighted avg     0.9771    0.9748    0.9759      1309
+
+Precision : 0.9748
+Recall    : 0.9748
+F1        : 0.9748
+
+
+=== CS ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.8652    0.7923    0.8271      5372
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.8084    0.7487    0.7774      4473
+         PER     0.9147    0.9457    0.9300      4423
+
+   micro avg     0.8486    0.8262    0.8372     14268
+   macro avg     0.6471    0.6217    0.6336     14268
+weighted avg     0.8627    0.8262    0.8434     14268
+
+Precision : 0.8486
+Recall    : 0.8262
+F1        : 0.8372
+
+
+-- Fine tuned wikiann --
+
+              precision    recall  f1-score   support
+
+         LOC     0.9098    0.9301    0.9198      5422
+         ORG     0.8906    0.8701    0.8803      4465
+         PER     0.9553    0.9566    0.9559      4536
+
+   micro avg     0.9183    0.9199    0.9191     14423
+   macro avg     0.9186    0.9189    0.9187     14423
+weighted avg     0.9182    0.9199    0.9189     14423
+
+Precision : 0.9183
+Recall    : 0.9199
+F1        : 0.9191
+
+
+=== HR ===
+-- spacy/hr_core_news_lg --
+              precision    recall  f1-score   support
+
+         LOC     0.8416    0.8481    0.8448      4917
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.8176    0.7317    0.7723      4085
+         PER     0.8937    0.8825    0.8880      4467
+
+   micro avg     0.8341    0.8242    0.8291     13469
+   macro avg     0.6382    0.6156    0.6263     13469
+weighted avg     0.8516    0.8242    0.8371     13469
+
+Precision : 0.8341
+Recall    : 0.8242
+F1        : 0.8291
+
+-- spacy/hr_core_news_md --
+
+-- spacy/hr_core_news_sm --
+
+-- ivlcic/xlmr-ner-slavic --
+
+
+-- Fine tuned wikiann --
+
+
+=== MK ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.9936    0.9591    0.9761       489
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.9715    0.9771    0.9743       349
+         PER     0.9875    0.9950    0.9912       398
+
+   micro avg     0.9845    0.9757    0.9801      1236
+   macro avg     0.7382    0.7328    0.7354      1236
+weighted avg     0.9854    0.9757    0.9804      1236
+
+Precision : 0.9845
+Recall    : 0.9757
+F1        : 0.9801
+
+
+-- Fine tuned wikiann --
+
+
+=== PL ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.8435    0.8084    0.8256      6034
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.7451    0.6369    0.6868      4255
+         PER     0.8670    0.9192    0.8924      4915
+
+   micro avg     0.8073    0.7962    0.8017     15204
+   macro avg     0.6139    0.5911    0.6012     15204
+weighted avg     0.8236    0.7962    0.8083     15204
+
+Precision : 0.8073
+Recall    : 0.7962
+F1        : 0.8017
+
+
+-- Fine tuned wikiann --
+
+
+
+=== RU ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.6176    0.8038    0.6985      4852
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.7904    0.5396    0.6413      3892
+         PER     0.7499    0.6348    0.6876      3590
+
+   micro avg     0.6745    0.6712    0.6729     12334
+   macro avg     0.5395    0.4945    0.5068     12334
+weighted avg     0.7106    0.6712    0.6773     12334
+
+Precision : 0.6745
+Recall    : 0.6712
+F1        : 0.6729
+
+
+-- spacy/ru_core_news_lg --
+
+-- spacy/ru_core_news_md --
+
+-- spacy/ru_core_news_sm --
+
+-- Dessan/ru_spacy_ru_updated --
+
+-- Fine tuned wikiann --
+
+
+=== SK ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.9892    0.9823    0.9858      4870
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.9692    0.9623    0.9658      3928
+         PER     0.9909    0.9931    0.9920      4507
+
+   micro avg     0.9828    0.9801    0.9814     13305
+   macro avg     0.7374    0.7344    0.7359     13305
+weighted avg     0.9839    0.9801    0.9820     13305
+
+Precision : 0.9828
+Recall    : 0.9801
+F1        : 0.9814
+
+
+-- Fine tuned wikiann --
+
+
+=== SL ===
+-- spacy/sl_core_news_lg --
+              precision    recall  f1-score   support
+
+         LOC     0.7888    0.8031    0.7959      5017
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.8218    0.6994    0.7557      3553
+         PER     0.8771    0.9161    0.8962      3886
+
+   micro avg     0.7976    0.8088    0.8031     12456
+   macro avg     0.6219    0.6046    0.6119     12456
+weighted avg     0.8257    0.8088    0.8157     12456
+
+Precision : 0.7976
+Recall    : 0.8088
+F1        : 0.8031
+
+
+-- spacy/sl_core_news_md --
+
+
+-- spacy/sl_core_news_sm --
+
+
+-- ivlcic/xlmr-ner-slavic --
+
+
+-- Fine tuned wikiann --
+
+
+
+=== SR ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.5596    0.6961    0.6204      3751
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.8415    0.6558    0.7371      3658
+         PER     0.8356    0.8610    0.8481      4050
+
+   micro avg     0.7167    0.7415    0.7289     11459
+   macro avg     0.5592    0.5532    0.5514     11459
+weighted avg     0.7471    0.7415    0.7381     11459
+
+Precision : 0.7167
+Recall    : 0.7415
+F1        : 0.7289
+
+
+-- Fine tuned wikiann --
+
+
+
+=== UK ===
+-- ivlcic/xlmr-ner-slavic --
+              precision    recall  f1-score   support
+
+         LOC     0.7189    0.7415    0.7301      5819
+        MISC     0.0000    0.0000    0.0000         0
+         ORG     0.7921    0.4750    0.5939      3825
+         PER     0.8155    0.8455    0.8302      3884
+
+   micro avg     0.7518    0.6960    0.7228     13528
+   macro avg     0.5816    0.5155    0.5385     13528
+weighted avg     0.7673    0.6960    0.7203     13528
+
+Precision : 0.7518
+Recall    : 0.6960
+F1        : 0.7228
+
+
+-- spacy/uk_core_news_lg --
+
+
+-- spacy/uk_core_news_md --
+
+
+-- spacy/uk_core_news_sm --
+
+
+-- Fine tuned wikiann --
