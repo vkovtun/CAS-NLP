@@ -14,7 +14,7 @@
 #_SBATCH --gres=gpu:rtx4090:1
 #_SBATCH --gres=gpu:a100:1
 #SBATCH --gres=gpu:h100:1
-#SBATCH --array=0-10
+#SBATCH --array=0-11
 
 # Slavic languages we consider:
 # be – Belarusian (East Slavic)
